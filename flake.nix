@@ -26,7 +26,7 @@
           fuzzel    = callModule "fuzzel";
           # zed       = callModule "zed";
           # niri      = callModule "niri";
-          # kitty     = callModule "kitty";
+          kitty     = callModule "kitty";
           # which-key = callModule "which-key";
           # firefox   = callModule "firefox";
         }
@@ -47,7 +47,7 @@
             fuzzel    = self.packages.${system}.fuzzel;
             # zed       = self.packages.${system}.zed;
             # niri      = self.packages.${system}.niri;
-            # kitty     = self.packages.${system}.kitty;
+            kitty     = self.packages.${system}.kitty;
             # which-key = self.packages.${system}.which-key;
             # firefox   = self.packages.${system}.firefox;
           };
