@@ -22,7 +22,7 @@
           zellij = callModule "zellij";
           helix  = callModule "helix";
           nh     = callModule "nh";
-          # foot      = callModule "foot";
+          foot      = callModule "foot";
           # fuzzel    = callModule "fuzzel";
           # zed       = callModule "zed";
           # niri      = callModule "niri";
@@ -43,7 +43,7 @@
             zellij = self.packages.${system}.zellij;
             helix  = self.packages.${system}.helix;
             nh     = self.packages.${system}.nh;
-            # foot      = self.packages.${system}.foot;
+            foot      = self.packages.${system}.foot;
             # fuzzel    = self.packages.${system}.fuzzel;
             # zed       = self.packages.${system}.zed;
             # niri      = self.packages.${system}.niri;
