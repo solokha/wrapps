@@ -30,9 +30,8 @@
           niri     = callModule "niri";
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs pkgs-unstable; };
-          # which-key = callModule "which-key";
-          desktop   = import ./desktop { inherit pkgs inputs self; };
-          env       = import ./env { inherit pkgs pkgs-unstable pkgs-master inputs self; };
+          desktop  = import ./desktop { inherit pkgs inputs self; };
+          env      = import ./env { inherit pkgs pkgs-unstable pkgs-master inputs self; };
         }
       );
 
@@ -55,10 +54,32 @@
             firefox  = self.packages.${system}.firefox;
             noctalia = self.packages.${system}.noctalia;
           };
+          inherit (self.packages.${system}) env desktop;
           inherit pkgs-unstable pkgs-master;
         };
 
-      nixosModules = { };
+      nixosModules = {
+        # Базовые пакеты: env, desktop и все wrapps
+        default = { config, lib, pkgs, ... }: {
+          environment.systemPackages = [
+            self.packages.${pkgs.stdenv.hostPlatform.system}.env
+            self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
+          ];
+        };
+
+        # Полная desktop-интеграция: greetd + niri + noctalia
+        desktop = { config, lib, pkgs, ... }: {
+          imports = [ self.nixosModules.default ];
+
+          services.greetd = {
+            enable = true;
+            settings.default_session = {
+              user = "greeter";
+              command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --remember --cmd 'dbus-run-session ${self.packages.${pkgs.stdenv.hostPlatform.system}.desktop}/bin/desktop'";
+            };
+          };
+        };
+      };
     };
 
   inputs = {
