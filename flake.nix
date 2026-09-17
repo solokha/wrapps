@@ -31,7 +31,7 @@
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs pkgs-unstable; };
           # which-key = callModule "which-key";
-          # desktop   = import ./desktop { inherit pkgs inputs self; };
+          desktop   = import ./desktop { inherit pkgs inputs self; };
           # env       = import ./env { inherit pkgs pkgs-unstable pkgs-master inputs self; };
         }
       );
