@@ -24,7 +24,7 @@
           nh     = callModule "nh";
           foot      = callModule "foot";
           fuzzel    = callModule "fuzzel";
-          # zed       = callModule "zed";
+          zed       = callModule "zed";
           # niri      = callModule "niri";
           kitty     = callModule "kitty";
           # which-key = callModule "which-key";
@@ -45,7 +45,7 @@
             nh     = self.packages.${system}.nh;
             foot      = self.packages.${system}.foot;
             fuzzel    = self.packages.${system}.fuzzel;
-            # zed       = self.packages.${system}.zed;
+            zed       = self.packages.${system}.zed;
             # niri      = self.packages.${system}.niri;
             kitty     = self.packages.${system}.kitty;
             # which-key = self.packages.${system}.which-key;
