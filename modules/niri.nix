@@ -1,4 +1,4 @@
-{ pkgs, self, ... }:
+{ pkgs, lib, self, ... }:
 let
   terminal = "${self.packages.${pkgs.stdenv.hostPlatform.system}.foot}/bin/foot";
   launcher = "${self.packages.${pkgs.stdenv.hostPlatform.system}.fuzzel}/bin/fuzzel";
@@ -71,14 +71,8 @@ let
       }
     }
 
-    workspace "w0" { layout { gaps 5; } }
-    workspace "w1" { layout { gaps 5; } }
-    workspace "w2" { layout { gaps 5; } }
-    workspace "w3" { layout { gaps 5; } }
-    workspace "w4" { layout { gaps 5; } }
-
     xwayland-satellite {
-      path "${pkgs.xwayland-satellite}/bin/xwayland-satellite"
+      path "${lib.getExe pkgs.xwayland-satellite}"
     }
   '';
 in

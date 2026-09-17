@@ -16,19 +16,23 @@
         let
           callModule = name: import (./modules + "/${name}.nix") {
             inherit pkgs pkgs-unstable pkgs-master inputs self;
+            lib = nixpkgs.lib;
           };
         in
         {
           zellij = callModule "zellij";
           helix  = callModule "helix";
           nh     = callModule "nh";
-          foot      = callModule "foot";
-          fuzzel    = callModule "fuzzel";
-          zed       = callModule "zed";
-          niri      = callModule "niri";
-          kitty     = callModule "kitty";
+          foot   = callModule "foot";
+          fuzzel = callModule "fuzzel";
+          kitty  = callModule "kitty";
+          zed    = callModule "zed";
+          niri   = callModule "niri";
+          firefox = callModule "firefox";
           # which-key = callModule "which-key";
-          # firefox   = callModule "firefox";
+          # noctalia  = import ./noctalia { inherit pkgs pkgs-unstable inputs self; };
+          # desktop   = import ./desktop { inherit pkgs inputs self; };
+          # env       = import ./env { inherit pkgs pkgs-unstable pkgs-master inputs self; };
         }
       );
 
@@ -40,17 +44,19 @@
         in
         {
           wrapps = {
-            zellij = self.packages.${system}.zellij;
-            helix  = self.packages.${system}.helix;
-            nh     = self.packages.${system}.nh;
-            foot      = self.packages.${system}.foot;
-            fuzzel    = self.packages.${system}.fuzzel;
-            zed       = self.packages.${system}.zed;
-            niri      = self.packages.${system}.niri;
-            kitty     = self.packages.${system}.kitty;
+            zellij  = self.packages.${system}.zellij;
+            helix   = self.packages.${system}.helix;
+            nh      = self.packages.${system}.nh;
+            foot    = self.packages.${system}.foot;
+            fuzzel  = self.packages.${system}.fuzzel;
+            kitty   = self.packages.${system}.kitty;
+            zed     = self.packages.${system}.zed;
+            niri    = self.packages.${system}.niri;
+            firefox = self.packages.${system}.firefox;
             # which-key = self.packages.${system}.which-key;
-            # firefox   = self.packages.${system}.firefox;
+            # noctalia  = self.packages.${system}.noctalia;
           };
+          # inherit (self.packages.${system}) env desktop;
           inherit pkgs-unstable pkgs-master;
         };
 
