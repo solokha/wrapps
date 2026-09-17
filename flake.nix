@@ -21,7 +21,7 @@
         in
         {
           zellij    = callModule "zellij";
-          # helix     = callModule "helix";
+          helix     = callModule "helix";
           # nh        = callModule "nh";
           # foot      = callModule "foot";
           # fuzzel    = callModule "fuzzel";
@@ -46,7 +46,7 @@
         {
           wrapps = {
             zellij    = self.packages.${system}.zellij;
-          #   helix     = self.packages.${system}.helix;
+            helix     = self.packages.${system}.helix;
           #   nh        = self.packages.${system}.nh;
           #   foot      = self.packages.${system}.foot;
           #   fuzzel    = self.packages.${system}.fuzzel;
