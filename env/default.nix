@@ -1,8 +1,8 @@
-{ pkgs, pkgs-unstable, pkgs-master, inputs, self }:
+{ pkgs, inputs, self }:
 let
   system = pkgs.stdenv.hostPlatform.system;
 
-  tools = import ./packages.nix { inherit pkgs pkgs-unstable pkgs-master; };
+  tools = import ./packages.nix { inherit pkgs; };
 
   wrapped = [
     self.packages.${system}.helix

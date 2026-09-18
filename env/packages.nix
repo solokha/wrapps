@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, pkgs-master }:
+{ pkgs }:
 with pkgs; [
   # Nix
   nil nixd statix alejandra manix nix-inspect
@@ -10,4 +10,7 @@ with pkgs; [
   git lazygit jq htop btop wget killall
   # Shell-инструменты
   atuin starship
+
+  # Из unstable
+  pkgs.unstable.nvd
 ]
