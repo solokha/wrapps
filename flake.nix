@@ -64,6 +64,8 @@
           environment.systemPackages = [
             self.packages.${pkgs.stdenv.hostPlatform.system}.env
             self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
+            self.packages.${pkgs.stdenv.hostPlatform.system}.firefox
+            self.packages.${pkgs.stdenv.hostPlatform.system}.foot
           ];
         };
 

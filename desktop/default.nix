@@ -7,6 +7,15 @@ in
 pkgs.writeShellScriptBin "desktop" ''
   set -e
 
+  # Если запускаемся из-под уже работающего wayland-композитора — чистим
+  # окружение, чтобы niri поднял СВОЮ композиционную сессию, а не пытался
+  # наследовать чужой WAYLAND_DISPLAY (иначе ввод/фокус летит в родителя).
+  if [ -n "''${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]; then
+    unset WAYLAND_DISPLAY DISPLAY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+    # новый сингулярный bus для сессии (иначе — чужая D-Bus-шина)
+    exec dbus-run-session -- ${niri}
+  fi
+
   systemctl --user import-environment \
     WAYLAND_DISPLAY \
     XDG_CURRENT_DESKTOP \
