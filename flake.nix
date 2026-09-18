@@ -55,7 +55,8 @@
             noctalia = self.packages.${system}.noctalia;
           };
           inherit (self.packages.${system}) env desktop;
-          inherit pkgs-unstable pkgs-master;
+          unstable = pkgs-unstable;
+          master = pkgs-master;
         };
 
       nixosModules = {
