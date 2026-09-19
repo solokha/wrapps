@@ -3,9 +3,6 @@ mode = "dark"
 source = "builtin"
 builtin = "Everforest"
 
-[shell]
-font = "JetBrainsMono Nerd Font"
-
 [bar]
 position = "right"
 density = "comfortable"
@@ -13,4 +10,3 @@ density = "comfortable"
 [wallpaper]
 enabled = true
 fill_mode = "crop"
-transition_type = "random"
