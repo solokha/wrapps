@@ -19,14 +19,19 @@ let
     eval "$(${pkgs.atuin}/bin/atuin init bash --disable-up-arrow)"
   '';
 
-  env = pkgs.writeShellScriptBin "env" ''
+  denv = pkgs.writeShellScriptBin "denv" ''
     export SHELL="${pkgs.bash}/bin/bash"
     export EDITOR="${self.packages.${system}.helix}/bin/hx"
     export PATH="${pkgs.lib.makeBinPath (tools ++ wrapped)}:$PATH"
     exec ${pkgs.bash}/bin/bash --rcfile ${envrc} "$@"
   '';
+
+  shell = pkgs.writeShellScriptBin "shell" ''
+    exec ${denv}/bin/denv "$@"
+  '';
 in
 pkgs.symlinkJoin {
   name = "env";
-  paths = tools ++ wrapped ++ [ env ];
+  paths = tools ++ wrapped ++ [ denv shell ];
+  meta.mainProgram = "denv";
 }

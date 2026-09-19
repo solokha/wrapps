@@ -21,7 +21,8 @@
 nix run github:solokha/wrapps#desktop
 
 # Портативная оболочка (bash + git + hx + zellij + nh + CLI-набор)
-nix run github:solokha/wrapps#env
+nix run github:solokha/wrapps#env   # то же самое, что #shell / бинарь denv на PATH
+nix run github:solokha/wrapps#shell
 ```
 
 Подключение к NixOS-системе — см. `infra` (flake input `github:solokha/wrapps/dev`,

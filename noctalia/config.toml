@@ -1,7 +1,7 @@
 [theme]
 mode = "dark"
 source = "builtin"
-builtin = "Everforest"
+builtin = "Kanagawa"
 
 [bar]
 position = "right"

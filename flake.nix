@@ -17,6 +17,10 @@
             inherit pkgs inputs self;
             lib = nixpkgs.lib;
           };
+          env    = import ./env { inherit pkgs inputs self; };
+          # Алиасы на тот же пакет: .#env / .#denv / .#shell ведут в один shell.
+          # Вынесены в let, чтобы не было eager-самоссылок внутри packages.
+          shell  = import ./env { inherit pkgs inputs self; };
         in
         {
           zellij   = callModule "zellij";
@@ -30,7 +34,9 @@
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs; };
           desktop  = import ./desktop { inherit pkgs inputs self; };
-          env      = import ./env { inherit pkgs inputs self; };
+          env      = env;
+          shell    = shell;
+          denv     = env;
         }
       );
 

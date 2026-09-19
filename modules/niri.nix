@@ -2,9 +2,14 @@
 let
   terminal = "${self.packages.${pkgs.stdenv.hostPlatform.system}.foot}/bin/foot";
   launcher = "${self.packages.${pkgs.stdenv.hostPlatform.system}.fuzzel}/bin/fuzzel";
+  noctalia = "${self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia}/bin/noctalia";
 
   cfg = pkgs.writeText "niri-config.kdl" ''
     prefer-no-csd
+
+    // Noctalia-бар стартует вместе с композитором (после готовности wayland-сокета),
+    // чтобы не приходилось поднимать его вручную из терминала.
+    spawn-at-startup "${noctalia}"
 
     input {
       keyboard {
