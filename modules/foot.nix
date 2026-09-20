@@ -3,7 +3,7 @@ let
   cfg = pkgs.writeText "foot.ini" ''
     [main]
     term=xterm-256color
-    font=JetBrainsMono Nerd Font:size=15
+    font=FiraCode Nerd Font:size=15
     pad=8x8 center
     include=~/.config/foot/themes/noctalia
 

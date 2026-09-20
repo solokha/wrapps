@@ -6,7 +6,7 @@ pkgs.writeShellScriptBin "fuzzel" ''
 
   cat >"$config" <<'EOF'
   [main]
-  font=JetBrainsMono Nerd Font:size=14
+  font=FiraCode Nerd Font:size=14
   terminal=foot -e
   prompt="> "
   lines=10

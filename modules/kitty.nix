@@ -3,7 +3,7 @@ let
   cfg = pkgs.writeText "kitty.conf" ''
     enable_audio_bell no
     font_size 15
-    font_family JetBrainsMono Nerd Font
+    font_family FiraCode Nerd Font
     cursor_text_color background
     allow_remote_control yes
     shell_integration enabled

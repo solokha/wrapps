@@ -9,10 +9,10 @@ let
       },
       "ui_font_size": 18,
       "buffer_font_size": 18,
-      "buffer_font_family": "JetBrainsMono Nerd Font",
+      "buffer_font_family": "FiraCode Nerd Font",
       "terminal": {
         "font_size": 18,
-        "font_family": "JetBrainsMono Nerd Font",
+        "font_family": "FiraCode Nerd Font",
         "line_height": {
           "custom": 1.2
         }
