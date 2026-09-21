@@ -120,6 +120,10 @@ let
       }
     }
 
+    // Тема курсора — на хосте (пресет объявляется в NixOS-конфиге инфры),
+    // здесь только generic-точка включения. Файл может отсутствовать.
+    include optional=true "/etc/niri/cursor.kdl"
+
     // Тема из noctalia (26.04 умеет ~ и optional=true).
     // Когда noctalia применяет тему — цвета здесь перекрывают fallback ниже.
     include optional=true "~/.config/niri/noctalia.kdl"
