@@ -28,10 +28,11 @@ pkgs.writeShellScriptBin "desktop" ''
   fi
 
   # Каскад fallback: niri (+noctalia через spawn-at-startup) → denv → понятное сообщение.
-  # После старта niri ждём появления нового wayland-сокета: это признак того, что
-  # композитор реально поднялся, а не упал на инициализации.
+  # После старта niri ждём появления живого wayland-сокета: признак того, что композитор
+  # реально поднялся, а не упал на инициализации. Живой сокет = есть запись в /proc/net/unix
+  # (в ядре). Залипший файл сокета от прошлой сессии (тот же путь, но без слушателя) —
+  # не считается: иначе при релогине desktop убивает здоровый niri и уходит в denv.
   rt="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-  before="$(find "$rt" -maxdepth 1 -name 'wayland-*' -type s 2>/dev/null | sort)"
 
   ${niri} --session &
   niri_pid=$!
@@ -39,12 +40,7 @@ pkgs.writeShellScriptBin "desktop" ''
   ok=1
   for _ in $(seq 1 30); do
     sleep 0.5
-    new="$(find "$rt" -maxdepth 1 -name 'wayland-*' -type s 2>/dev/null | sort)"
-    if [ -n "$before" ]; then
-      if [ "$new" != "$before" ] && [ -n "$new" ]; then ok=0; break; fi
-    elif [ -n "$new" ]; then
-      ok=0; break
-    fi
+    if grep -qs " $rt/wayland-" /proc/net/unix; then ok=0; break; fi
     # niri вышел раньше, чем поднял композитор — сразу в fallback.
     if ! kill -0 "$niri_pid" 2>/dev/null; then break; fi
   done
