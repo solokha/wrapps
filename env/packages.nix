@@ -11,6 +11,9 @@ with pkgs; [
   # Shell-инструменты
   atuin starship
 
+  # Ключи
+  sops age ssh-to-age openssh
+
   # Из unstable
   pkgs.unstable.nvd
 ]
