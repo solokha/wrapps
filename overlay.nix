@@ -22,6 +22,8 @@ in {
     niri     = inputs.self.packages.${system}.niri;
     firefox  = inputs.self.packages.${system}.firefox;
     noctalia = inputs.self.packages.${system}.noctalia;
+    # Автоматическая переустановка хоста (живёт в overlay, но не в #env).
+    nixos-anywhere = inputs.self.packages.${system}.nixos-anywhere;
   };
   inherit (inputs.self.packages.${system}) env desktop;
 }

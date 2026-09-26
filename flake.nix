@@ -34,6 +34,15 @@
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs; };
           desktop  = import ./desktop { inherit pkgs inputs self; };
+          # Переустановка хоста: НЕ часть env, вызывается точечно при
+          # развёртывании. См. infra/docs/deploy.md.
+          nixos-anywhere = pkgs.callPackage ./modules/nixos-anywhere.nix {
+            wrapps.nixosAnywhere.enable = true;
+            wrapps.nixosAnywhere.extraPackages = with pkgs; [
+              disko
+              env
+            ];
+          };
           env      = env;
           shell    = shell;
           denv     = env;
