@@ -15,6 +15,17 @@
 - `nixosModules.desktop` — NixOS-модуль: greetd + запуск десктопа (`niri + noctalia`).
 - `nixosModules.default` — добавляет в `environment.systemPackages` env, desktop, firefox, foot.
 
+## Origin
+
+Репозиторий публичный, `origin` — по SSH:
+```
+git@github.com:solokha/wrapps.git      # ветка dev
+```
+
+Ветка `dev` — рабочая; `main` пустая и не используется. `infra` подключает
+этот репозиторий как вход флейка (`github:solokha/wrapps/dev`), ревизия
+зафиксирована в его `flake.lock`.
+
 ## Параметры
 
 ```bash
