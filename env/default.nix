@@ -27,15 +27,28 @@ let
       export SSH_AUTH_SOCK="$HOME/.ssh/socket"
 
       # Ключи из токена: восстановить и загрузить в агент (PIN спросит один раз).
+      # Загружаются ВСЕ найденные: порядок имён не должен решать, какой ключ
+      # уедет в GitHub. Лишних касаний это не добавляет — ssh сначала проверяет
+      # публичный ключ без подписи, и непринятый ключ отбрасывается без касания.
+      # WRAPPS_SK_KEY=~/.ssh/ключ — загрузить только этот.
       keys() {
-        local k
-        for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
-          [ -f "$k" ] || continue
+        local k loaded=
+        local -a cands=()
+        if [ -n "''${WRAPPS_SK_KEY:-}" ]; then
+          cands+=("$WRAPPS_SK_KEY")
+        else
+          cands+=("$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*)
+        fi
+        for k in "''${cands[@]}"; do
           case "$k" in *.pub) continue ;; esac
-          ssh-add "$k" 2>/dev/null && return 0
+          [ -f "$k" ] || continue
+          ssh-add "$k" 2>/dev/null && loaded="$loaded $k"
         done
-        echo "sk-ключей в ~/.ssh нет: ssh-keygen -K -w ~/.ssh" >&2
-        return 1
+        if [ -z "$loaded" ]; then
+          echo "sk-ключей в ~/.ssh нет: cd ~/.ssh && ssh-keygen -K" >&2
+          return 1
+        fi
+        echo "sk-ключи в агенте:$loaded" >&2
       }
       ssh-add -l >/dev/null 2>&1 || keys || true
     fi
