@@ -10,12 +10,15 @@ let
     self.packages.${system}.nh
   ];
 
-  # Диалог PIN с ограничением числа обращений к токену.
+  # Диалог PIN: отвечает агенту ровно тем, что ввёл человек.
   #
-  # Считать нужно потому, что неверный PIN тратит попытку на самом токене, а
-  # счётчик попыток обнуляется только сбросом через меню токена. Всё, что
-  # требуется от агента, это подставить сюда диалог, а всё, что требуется от
-  # диалога, — отдать ответ в stdout, поэтому скрипт тонкий.
+  # Своего счётчика попыток здесь нет и быть не должно. Скрипт получает строку
+  # и отдаёт её, а верный PIN или нет — вопрос токена, и узнать это отсюда
+  # нельзя. Счётчик запросов считал бы и успешные, отказывая после трёх
+  # нормальных подписей, то есть давал бы ложную защиту вместо настоящей.
+  # Остаток попыток виден только в меню самого токена; читать его программно
+  # нечем — fido2-token -L показывает вендора и продукт, ykman этот токен не
+  # видит.
   askpass = pkgs.writeShellScriptBin "wrapps-askpass" ''
     set -uo pipefail
 
@@ -29,32 +32,18 @@ let
         ;;
     esac
 
-    counter="''${WRAPPS_PIN_COUNT_FILE:?не задан путь к счётчику}"
-    limit=3
-
-    n=0
-    if [ -f "$counter" ]; then
-      IFS= read -r n <"$counter" || n=0
-    fi
-    case "$n" in
-      *[!0-9]*) n=0 ;;
-    esac
-
-    if [ "$n" -ge "$limit" ]; then
-      printf 'wrapps-askpass: лимит запросов PIN исчерпан (%s из %s), токен не тронут\n' \
-        "$n" "$limit" >&2
-      exit 1
-    fi
-
-    printf '%s\n' "$((n + 1))" >"$counter"
     exec ''${WRAPPS_PIN_DIALOG:?не указан диалог} "$@"
   '';
 
   # Блок в ~/.ssh/config для хостов, где нет /etc/ssh/ssh_config из NixOS:
   # live ISO и чужие машины. Нужен потому, что ssh не угадывает имена ключей с
   # FIDO2-токенов: в списке IdentityFile по умолчанию есть только `id_ecdsa_sk`,
-  # а файл называется `id_ecdsa_sk_rk_solo@clone`, и без блока серверу не
-  # предлагается ничего, а ssh уходит в пароль.
+  # а файл называется `id_ecdsa_sk_rk_solo@clone`. Без блока серверу не
+  # предлагается ничего и ssh уходит в пароль.
+  #
+  # На NixOS-хостах тот же блок лежит в /etc/ssh/ssh_config (infra,
+  # modules/services/git.nix) и этот скрипт там ничего не меняет: его блок
+  # отличается маркером, а чужой конфиг только дополняется.
   sshconfig = pkgs.writeShellScriptBin "wrapps-ssh-config" ''
     set -uo pipefail
 
@@ -81,7 +70,7 @@ let
     chmod 700 "$HOME/.ssh"
 
     # IdentitiesOnly снимает поиск по агенту: иначе ssh перебирает всё, что
-    # там лежит, и на чужом хосте предложит оба токена — лишнее окно с PIN.
+    # там лежит, и предлагает серверу лишние токены.
     printf '\n%s\n# Ключи с именами FIDO2-токенов ssh не угадывает: в списке\n# IdentityFile по умолчанию есть только id_ecdsa_sk.\nHost *\n  IdentitiesOnly yes%b\n' \
       "$marker" "$keys" >>"$cfg"
 
@@ -102,13 +91,12 @@ let
       # протоколу Assuan и в роли askpass зависает.
       dialog=${pkgs.openssh-askpass}/libexec/gtk-ssh-askpass
     else
-      dialog=none
+      dialog=""
     fi
 
     sock="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wrapps-agent.sock"
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
-    countfile="$sock.pin-count"
 
     # Переиспользовать агент можно только если он наш, жив и поднят с тем же
     # диалогом. Последнее — не педантизм: агент наследует SSH_ASKPASS при
@@ -136,7 +124,7 @@ let
         SSH_AUTH_SOCK="$sock" ssh-agent -k >/dev/null 2>&1 || true
         echo "старый агент на $sock снят: он поднят с другим диалогом" >&2
       fi
-      rm -f "$sock" "$pidfile" "$countfile"
+      rm -f "$sock" "$pidfile"
 
       # Вывод `ssh-agent -a SOCK` — строки `VAR=VALUE; export VAR;` плюс
       # `echo Agent pid N;`. Последнюю не выполняем: она ушла бы в stdout и
@@ -144,7 +132,6 @@ let
       out="$(SSH_ASKPASS="$dialog" \
              SSH_ASKPASS_REQUIRE="''${dialog:+force}" \
              WRAPPS_PIN_DIALOG="$dialog" \
-             WRAPPS_PIN_COUNT_FILE="$countfile" \
                ssh-agent -a "$sock")"
       pid="$(printf '%s\n' "$out" | sed -n 's/^SSH_AGENT_PID=\([^;]*\);.*/\1/p' | head -n1)"
       got="$(printf '%s\n' "$out" | sed -n 's/^SSH_AUTH_SOCK=\([^;]*\);.*/\1/p' | head -n1)"
@@ -155,9 +142,9 @@ let
       printf '%s\n%s\n' "$pid" "$dialog" >"$pidfile"
     fi
 
-    # Дальше в скрипте ssh-add должен обращаться к агенту, которого мы только
-    # что подняли, а не к тому, что унаследован от вызывающего. Без этого
-    #export проверка живости и автозагрузка ключа работают с чужим агентом.
+    # Дальше ssh-add должен обращаться к агенту, которого мы только что
+    # подняли, а не к унаследованному от вызывающего, иначе проверка живости
+    # и автозагрузка ключа работают с чужим агентом.
     export SSH_AUTH_SOCK="$sock"
 
     # rc=0 — ключи есть, rc=1 — агент жив и пуст, rc=2 — агента нет.
@@ -166,14 +153,13 @@ let
       exit 1
     }
 
-    # Ключ в агент — здесь, а не на стороне вызывающего. Без этого вход по
-    # токену уходит в предложение серверу всех ключей подряд: ssh получает
-    # отказы и дёргает токен по разу на попытку, выедая лимит впустую.
+    # Ключ в агент — здесь, а не на стороне вызывающего. Без этого ssh не
+    # знает, какой ключ предлагать, и на чужом хосте уходит в пароль.
     if ! ssh-add -l 2>/dev/null | grep -qE 'ECDSA-SK|ED25519-SK'; then
       for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
         case "$k" in *.pub) continue ;; esac
         if [ -f "$k" ]; then
-          # Один ssh-add — один запрос PIN. Второй токен не нужен: GitHub ходит
+          # Один ssh-add — один запрос PIN, и оба токена не нужны: хост идёт
           # по ~/.ssh/config с IdentitiesOnly и одним IdentityFile.
           ssh-add "$k" >/dev/null 2>&1 || true
           break
@@ -181,11 +167,10 @@ let
       done
     fi
 
-    if [ "$dialog" != none ]; then
+    if [ -n "$dialog" ]; then
       echo "export SSH_ASKPASS=${askpass}/bin/wrapps-askpass"
       echo "export SSH_ASKPASS_REQUIRE=force"
       echo "export WRAPPS_PIN_DIALOG=$dialog"
-      echo "export WRAPPS_PIN_COUNT_FILE=$countfile"
     fi
     echo "export SSH_AUTH_SOCK=$sock"
   '';

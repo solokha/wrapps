@@ -14,8 +14,7 @@ with pkgs; [
   # Ключи
   sops age ssh-to-age openssh
 
-  # Диалог PIN для ssh-agent. Именно openssh-askpass, а не pinentry: pinentry
-  # говорит с gpg-агентом по протоколу Assuan и как askpass зависает.
+  # Диалог PIN для ssh-agent, только в графической сессии.
   openssh-askpass
 
   # Аварийное восстановление: LUKS-keystore + возраст-идентичности с
