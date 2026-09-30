@@ -15,6 +15,11 @@
 - `nixosModules.desktop` — NixOS-модуль: greetd + запуск десктопа (`niri + noctalia`).
 - `nixosModules.default` — добавляет в `environment.systemPackages` env, desktop, firefox, foot.
 
+В `#env` есть четыре команды про ключи, все в PATH оболочки: `wrapps-agent`
+(поднять агента, вывод для `eval`), `wrapps-keys` (загрузить sk-ключи),
+`gitauth` (то и другое одной строкой), `gitsetup` (конфиг git там, где нет
+системного). Подробности — ниже, в разделе про ключи.
+
 ## Origin
 
 Репозиторий публичный, `origin` — по SSH:
@@ -39,26 +44,58 @@ nix run github:solokha/wrapps#shell
 
 ## Ключи в оболочке (`#env`)
 
-При старте оболочка сама поднимает OpenSSH `ssh-agent` на сокете `~/.ssh/socket`
-(агент GNOME/gcr не умеет security-ключи `sk`) и подгружает sk-ключ из `~/.ssh`:
+Оболочка поднимает **свой** `ssh-agent` на сокете
+`$XDG_RUNTIME_DIR/wrapps-agent.sock` и подгружает sk-ключи из `~/.ssh`. Свой
+сокет, а не системный: агент, поднятый без `SSH_ASKPASS` в окружении, на FIDO2
+отвечает `agent refused operation`, и это выглядит как «подпись невозможна».
 
 ```bash
-# восстановить резидентный sk-ключи с FIDO2-токена (один раз, спросит PIN).
+# восстановить резидентные sk-ключи с FIDO2-токенов (один раз, спросит PIN).
 # -K пишет файлы в текущий каталог, поэтому сначала cd.
 cd ~/.ssh && ssh-keygen -K
 
-# внутри env: SSH_AUTH_SOCK уже указывает на рабочий агент
-keys                # вручную добавить sk-ключи в агент (функция оболочки)
+# внутри env агент уже поднят и ключи загружены; вручную — только если нужно
+wrapps-keys                # добавить sk-ключи в агент (пропускает уже загруженные)
+eval "$(gitauth)"          # то же: агент + ключи, три переменные для eval
 ssh -T git@github.com
 ```
 
-`keys` загружает в агент **все** найденные sk-ключи — порядок имён не решает,
+`wrapps-keys` загружает **все** найденные sk-ключи — порядок имён не решает,
 какой уедет. Непринятый сервером ключ касания не требует: ssh проверяет
-публичный ключ до подписи. Чтобы загрузить ровно один ключ — `WRAPPS_SK_KEY` читает функция `keys`:
+публичный ключ до подписи. Чтобы загрузить ровно один ключ:
 
 ```bash
-WRAPPS_SK_KEY=~/.ssh/id_ecdsa_sk_rk_solo@clone keys
+WRAPPS_SK_KEY=~/.ssh/id_ecdsa_sk_rk_solo@clone wrapps-keys
 ```
+
+### Где спрашивается PIN
+
+Агент без терминала (из графической сессии, из запуска агента) сам зовёт
+`SSH_ASKPASS`. `wrapps-agent` ставит туда штатный `openssh-askpass` из nixpkgs
+(`libexec/gtk-ssh-askpass`, GTK3) — окно с PIN. Свой диалог не пишется:
+askpass-протокол — приглашение в `argv[1]`, секрет в stdout — это ровно то, что
+делает `openssh-askpass`. `pinentry` не подходит: это диалог gpg-агента, он
+говорит по Assuan и в этой роли зависает.
+
+Без дисплея `SSH_ASKPASS` намеренно **не** задаётся: с консоли live ISO терминал
+есть, и агент спрашивает сам. Задать принудительно можно переменными
+`WRAPPS_AGENT_SOCK` (путь к сокету) и `WRAPPS_ASKPASS` (свой бинарь).
+
+### Подпись коммитов и push
+
+`/etc/gitconfig` на NixOS-хостах уже настраивает `gpg.format=ssh`, `commit.gpgsign`
+и `user.signingKey` — это делает `infra` (см. `modules/services/git.nix`), руками
+ничего делать не нужно. На чужих хостах и live ISO системного конфига нет:
+
+```bash
+gitsetup                  # gpg.format=ssh, gpgsign, signingKey, ~/.ssh/config
+```
+
+`gitsetup` настраивает только то, чего нет: если системный `gpg.format` уже
+`ssh`, скрипт ничего не меняет. `~/.ssh/config` создаётся, только если его нет,
+и никогда не перезаписывает существующий — в нём может быть что-то ещё, кроме
+GitHub. `user.name` и `user.email` скрипт не выдумывает: без них git commit
+не пройдёт, и он об этом говорит.
 
 Пакеты `sops` / `age` / `age-keygen` / `ssh-to-age` — в PATH оболочки; путь к
 age-ключам sops задаётся через `SOPS_AGE_KEY_FILE` (по умолчанию
