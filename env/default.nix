@@ -50,6 +50,45 @@ let
     exec ''${WRAPPS_PIN_DIALOG:?не указан диалог} "$@"
   '';
 
+  # Блок в ~/.ssh/config для хостов, где нет /etc/ssh/ssh_config из NixOS:
+  # live ISO и чужие машины. Нужен потому, что ssh не угадывает имена ключей с
+  # FIDO2-токенов: в списке IdentityFile по умолчанию есть только `id_ecdsa_sk`,
+  # а файл называется `id_ecdsa_sk_rk_solo@clone`, и без блока серверу не
+  # предлагается ничего, а ssh уходит в пароль.
+  sshconfig = pkgs.writeShellScriptBin "wrapps-ssh-config" ''
+    set -uo pipefail
+
+    cfg="$HOME/.ssh/config"
+    marker="# wrapps: FIDO2-ключи"
+
+    # Свой блок не трогаем никогда, чужой конфиг — только дополняем.
+    if [ -f "$cfg" ] && grep -qF "$marker" "$cfg"; then
+      exit 0
+    fi
+
+    keys=""
+    for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
+      case "$k" in *.pub) continue ;; esac
+      [ -f "$k" ] || continue
+      keys="$keys\n  IdentityFile $k"
+    done
+    if [ -z "$keys" ]; then
+      printf 'sk-ключей в ~/.ssh нет: cd ~/.ssh && ssh-keygen -K\n' >&2
+      exit 1
+    fi
+
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+
+    # IdentitiesOnly снимает поиск по агенту: иначе ssh перебирает всё, что
+    # там лежит, и на чужом хосте предложит оба токена — лишнее окно с PIN.
+    printf '\n%s\n# Ключи с именами FIDO2-токенов ssh не угадывает: в списке\n# IdentityFile по умолчанию есть только id_ecdsa_sk.\nHost *\n  IdentitiesOnly yes%b\n' \
+      "$marker" "$keys" >>"$cfg"
+
+    chmod 600 "$cfg"
+    printf 'добавлен блок для FIDO2-ключей в %s\n' "$cfg" >&2
+  '';
+
   # Подъём агента. Вызывается как `eval "$(wrapps-agent)"`, поэтому в stdout
   # идут только строки для eval, всё остальное — в stderr.
   agent = pkgs.writeShellScriptBin "wrapps-agent" ''
@@ -173,6 +212,7 @@ let
 
     if [ "$_have_key" = 1 ] && [ "$_have_fido" = 1 ]; then
       eval "$(${agent}/bin/wrapps-agent)"
+      ${sshconfig}/bin/wrapps-ssh-config >/dev/null 2>&1 || true
     fi
 
     # sops/age: стандартные пути, чтобы правился ~/.config/sops.
@@ -192,6 +232,6 @@ let
 in
 pkgs.symlinkJoin {
   name = "env";
-  paths = tools ++ wrapped ++ [ denv shell agent askpass ];
+  paths = tools ++ wrapped ++ [ denv shell agent askpass sshconfig ];
   meta.mainProgram = "denv";
 }
