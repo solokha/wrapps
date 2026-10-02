@@ -1,7 +1,7 @@
 {
   description = "Portable desktop environment and wrapped packages";
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-master, nix-wrapper-modules, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nix-wrapper-modules, ... } @ inputs:
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       overlay = import ./overlay.nix { inherit inputs; };
@@ -38,6 +38,13 @@
         }
       );
 
+      checks = forAllSystems ({ system, pkgs }: {
+        env = self.packages.${system}.env;
+        desktop = self.packages.${system}.desktop;
+      });
+
+      formatter = forAllSystems ({ pkgs, ... }: pkgs.alejandra);
+
       overlays.default = overlay;
 
       nixosModules = {
@@ -67,7 +74,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
