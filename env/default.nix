@@ -6,25 +6,12 @@ let
 
   wrapped = [
     self.packages.${system}.helix
-    self.packages.${system}.zellij
     self.packages.${system}.nh
   ];
 
-  # Диалог PIN: отвечает агенту ровно тем, что ввёл человек.
-  #
-  # Своего счётчика попыток здесь нет и быть не должно. Скрипт получает строку
-  # и отдаёт её, а верный PIN или нет — вопрос токена, и узнать это отсюда
-  # нельзя. Счётчик запросов считал бы и успешные, отказывая после трёх
-  # нормальных подписей, то есть давал бы ложную защиту вместо настоящей.
-  # Остаток попыток виден только в меню самого токена; читать его программно
-  # нечем — fido2-token -L показывает вендора и продукт, ykman этот токен не
-  # видит.
   askpass = pkgs.writeShellScriptBin "wrapps-askpass" ''
     set -uo pipefail
 
-    # Агент задаёт два вопроса: подтверждение присутствия и PIN. На первый
-    # отвечаем сами: настоящая проверка — касание токена, его нельзя ни
-    # пропустить, ни подделать, а лишнее окно только мешает.
     case "''${1:-}" in
       *"Confirm user presence"*)
         printf 'y\n'
@@ -35,22 +22,12 @@ let
     exec ''${WRAPPS_PIN_DIALOG:?не указан диалог} "$@"
   '';
 
-  # Блок в ~/.ssh/config для хостов, где нет /etc/ssh/ssh_config из NixOS:
-  # live ISO и чужие машины. Нужен потому, что ssh не угадывает имена ключей с
-  # FIDO2-токенов: в списке IdentityFile по умолчанию есть только `id_ecdsa_sk`,
-  # а файл называется `id_ecdsa_sk_rk_solo@clone`. Без блока серверу не
-  # предлагается ничего и ssh уходит в пароль.
-  #
-  # На NixOS-хостах тот же блок лежит в /etc/ssh/ssh_config (infra,
-  # modules/services/git.nix) и этот скрипт там ничего не меняет: его блок
-  # отличается маркером, а чужой конфиг только дополняется.
   sshconfig = pkgs.writeShellScriptBin "wrapps-ssh-config" ''
     set -uo pipefail
 
     cfg="$HOME/.ssh/config"
     marker="# wrapps: FIDO2-ключи"
 
-    # Свой блок не трогаем никогда, чужой конфиг — только дополняем.
     if [ -f "$cfg" ] && grep -qF "$marker" "$cfg"; then
       exit 0
     fi
@@ -69,12 +46,6 @@ let
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
 
-    # Перечисление, а не один ключ: вставлен токен всегда один, а какой —
-    # неизвестно, и сопоставить его с ключом нечем. ssh перебирает IdentityFile
-    # по очереди, и ключ, которого нет в агенте, отсеивается молча и без PIN.
-    #
-    # IdentitiesOnly снимает поиск по агенту: иначе ssh перебирает всё, что
-    # там лежит, и предлагает серверу лишние токены.
     printf '\n%s\n# Ключи с именами FIDO2-токенов ssh не угадывает: в списке\n# IdentityFile по умолчанию есть только id_ecdsa_sk.\nHost *\n  IdentitiesOnly yes%b\n' \
       "$marker" "$keys" >>"$cfg"
 
@@ -82,17 +53,10 @@ let
     printf 'добавлен блок для FIDO2-ключей в %s\n' "$cfg" >&2
   '';
 
-  # Подъём агента. Вызывается как `eval "$(wrapps-agent)"`, поэтому в stdout
-  # идут только строки для eval, всё остальное — в stderr.
   agent = pkgs.writeShellScriptBin "wrapps-agent" ''
     set -uo pipefail
 
-    # Диалог нужен там, где у агента нет терминала, — в графической сессии.
-    # На консоли live ISO терминал есть, агент спрашивает сам, и поднимать
-    # окно там нечем. Поэтому без дисплея SSH_ASKPASS не задаётся вовсе.
     if [ -n "''${WAYLAND_DISPLAY:-''${DISPLAY:-}}" ]; then
-      # openssh-askpass, а не pinentry: pinentry говорит с gpg-агентом по
-      # протоколу Assuan и в роли askpass зависает.
       dialog=${pkgs.openssh-askpass}/libexec/gtk-ssh-askpass
     else
       dialog=""
@@ -102,16 +66,8 @@ let
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
 
-    # Переиспользовать агент можно только если он наш, жив и поднят с тем же
-    # диалогом. Последнее — не педантизм: агент наследует SSH_ASKPASS при
-    # старте и больше переменную не читает, поэтому агент, поднятый без неё,
-    # жив, держит ключи и всё выглядит исправно, но подписывать не умеет.
-    # Сверять pid и сокет недостаточно: сокет тот же, условия разные.
     usable() {
       local pid cmd want
-      # Сокет проверяется первым: его можно убить снаружи, а pid-файл и процесс
-      # останутся, и агент без сокета объявит себя рабочим — подпись и push
-      # после этого не идут, а ssh-add -l на таком агенте молчит.
       [ -S "$sock" ] || return 1
       [ -f "$pidfile" ] || return 1
       IFS= read -r pid <"$pidfile" || return 1
@@ -134,9 +90,6 @@ let
       fi
       rm -f "$sock" "$pidfile"
 
-      # Вывод `ssh-agent -a SOCK` — строки `VAR=VALUE; export VAR;` плюс
-      # `echo Agent pid N;`. Последнюю не выполняем: она ушла бы в stdout и
-      # сломала бы eval у вызывающего. PID берём из SSH_AGENT_PID.
       out="$(SSH_ASKPASS="$dialog" \
              SSH_ASKPASS_REQUIRE="''${dialog:+force}" \
              WRAPPS_PIN_DIALOG="$dialog" \
@@ -150,32 +103,16 @@ let
       printf '%s\n%s\n' "$pid" "$dialog" >"$pidfile"
     fi
 
-    # Дальше ssh-add должен обращаться к агенту, которого мы только что
-    # подняли, а не к унаследованному от вызывающего, иначе проверка живости
-    # и автозагрузка ключа работают с чужим агентом.
     export SSH_AUTH_SOCK="$sock"
 
-    # rc=0 — ключи есть, rc=1 — агент жив и пуст, rc=2 — агента нет.
     ssh-add -l >/dev/null 2>&1 || [ $? -eq 1 ] || {
       echo "агент на $sock не отвечает" >&2
       exit 1
     }
 
-    # Все sk-ключи в агент, а не один. Список в ~/.ssh один и тот же, а
-    # вставлен токен всегда один, и какой именно — неизвестно: сопоставить
-    # «вставлен этот» с ключом нечем (fido2-token -L не даёт серийника, ykman
-    # токен не видит). Поэтому грузим все, а выбор оставляем ssh: он перебирает
-    # IdentityFile по очереди, и на ключ, которого нет в агенте, агент отвечает
-    # отказом молча и без PIN. Вставленный токен при этом тратит ровно одно
-    # окно, остальные отсеиваются бесплатно.
-    #
-    # Внешнего условия «если sk-ключ уже есть, ничего не делать» здесь нет
-    # намеренно: с ним агент, в котором лежит чужой токен, считался бы
-    # готовым, и наш ключ в него не попадал бы.
     for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
       case "$k" in *.pub) continue ;; esac
       [ -f "$k" ] || continue
-      # Уже добавленный ssh-add отвергает молча, PIN не спрашивает.
       ssh-add "$k" >/dev/null 2>&1 || true
     done
 
@@ -188,17 +125,10 @@ let
   '';
 
   envrc = pkgs.writeText "envrc" ''
-    # Промпт и история: темы приходят из noctalia (палитра/настройки в ~/.config),
-    # без noctalia — дефолтный вид.
     eval "$(${pkgs.starship}/bin/starship init bash)"
 
-    # atuin: история; стрелка-вверх остаётся за bash, чтобы не выгрызать нативы.
     eval "$(${pkgs.atuin}/bin/atuin init bash --disable-up-arrow)"
 
-    # Агент для FIDO2-ключей поднимается, только если ключи физически есть и
-    # токен в системе: на live ISO и на чужом хосте ~/.ssh может приехать из
-    # контракта сохранения вместе с handle'ами, и поднимать там агент для
-    # GitHub никто не просил.
     _have_key=0
     for _k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
       case "$_k" in *.pub) continue ;; esac
@@ -212,7 +142,6 @@ let
       ${sshconfig}/bin/wrapps-ssh-config >/dev/null 2>&1 || true
     fi
 
-    # sops/age: стандартные пути, чтобы правился ~/.config/sops.
     export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
   '';
 

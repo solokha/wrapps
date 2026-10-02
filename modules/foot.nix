@@ -19,9 +19,6 @@ let
     label-letters=sadfjklewcmpgh
   '';
 
-  # Палитра активной темы noctalia (builtin Kanagawa) — тот же контент, что
-  # noctalia пишет сама в $XDG_CONFIG_HOME/foot/themes/noctalia, поэтому
-  # pre-warm до первого применения темы даёт тот же вид.
   fallbackTheme = pkgs.writeText "foot-noctalia.fallback" ''
     [colors-dark]
     foreground=545464
@@ -54,8 +51,6 @@ pkgs.writeShellScriptBin "foot" ''
   theme_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/foot/themes"
   theme="$theme_dir/noctalia"
 
-  # Пока noctalia не применила тему — кладём фолбэк, чтобы foot стартовал даже
-  # в standalone (missing include у foot — фатальная ошибка).
   if [ ! -f "$theme" ]; then
     mkdir -p "$theme_dir"
     cat ${fallbackTheme} >"$theme"

@@ -18,8 +18,6 @@
             lib = nixpkgs.lib;
           };
           env    = import ./env { inherit pkgs inputs self; };
-          # Алиасы на тот же пакет: .#env / .#denv / .#shell ведут в один shell.
-          # Вынесены в let, чтобы не было eager-самоссылок внутри packages.
           shell  = import ./env { inherit pkgs inputs self; };
         in
         {
@@ -34,8 +32,6 @@
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs; };
           desktop  = import ./desktop { inherit pkgs inputs self; };
-          # Переустановка хоста: НЕ часть env, вызывается точечно при
-          # развёртывании. См. infra/docs/deploy.md.
           nixos-anywhere = callModule "nixos-anywhere";
           env      = env;
           shell    = shell;
@@ -46,7 +42,6 @@
       overlays.default = overlay;
 
       nixosModules = {
-        # Базовые пакеты: env, desktop и все wrapps
         default = { config, lib, pkgs, ... }: {
           environment.systemPackages = [
             self.packages.${pkgs.stdenv.hostPlatform.system}.env
@@ -56,7 +51,6 @@
           ];
         };
 
-        # Полная desktop-интеграция: greetd + niri + noctalia
         desktop = { config, lib, pkgs, ... }: {
           imports = [ self.nixosModules.default ];
 
