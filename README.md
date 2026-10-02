@@ -14,7 +14,7 @@
 | `#desktop` | Вход в сессию: greetd + niri + noctalia |
 | `#foot`, `#fuzzel` | Терминал и лаунчер с темой noctalia |
 | `#niri`, `#noctalia` | Композитор и оболочка рабочего стола |
-| `#firefox`, `#kitty`, `#zed`, `#helix`, `#zellij` | Обёрнутые приложения |
+| `#firefox`, `#zed`, `#helix`, `#zellij` | Обёрнутые приложения |
 | `#nh` | Обёртка NixOS-реконфигурации |
 | `#nixos-anywhere` | Переустановка хоста, вызывается отдельно, не часть `#env` |
 

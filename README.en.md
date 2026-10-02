@@ -14,7 +14,7 @@ installation required.
 | `#desktop` | Session entry point: greetd + niri + noctalia |
 | `#foot`, `#fuzzel` | Terminal and launcher with the noctalia theme |
 | `#niri`, `#noctalia` | Compositor and desktop shell |
-| `#firefox`, `#kitty`, `#zed`, `#helix`, `#zellij` | Wrapped applications |
+| `#firefox`, `#zed`, `#helix`, `#zellij` | Wrapped applications |
 | `#nh` | NixOS configuration helper |
 | `#nixos-anywhere` | Host reinstall, invoked separately, not part of `#env` |
 

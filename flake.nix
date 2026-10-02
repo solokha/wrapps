@@ -26,8 +26,7 @@
           nh       = callModule "nh";
           foot     = callModule "foot";
           fuzzel   = callModule "fuzzel";
-          kitty    = callModule "kitty";
-          zed      = callModule "zed";
+                    zed      = callModule "zed";
           niri     = callModule "niri";
           firefox  = callModule "firefox";
           noctalia = import ./noctalia { inherit pkgs; };

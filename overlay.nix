@@ -17,8 +17,7 @@ in {
     nh       = inputs.self.packages.${system}.nh;
     foot     = inputs.self.packages.${system}.foot;
     fuzzel   = inputs.self.packages.${system}.fuzzel;
-    kitty    = inputs.self.packages.${system}.kitty;
-    zed      = inputs.self.packages.${system}.zed;
+        zed      = inputs.self.packages.${system}.zed;
     niri     = inputs.self.packages.${system}.niri;
     firefox  = inputs.self.packages.${system}.firefox;
     noctalia = inputs.self.packages.${system}.noctalia;
