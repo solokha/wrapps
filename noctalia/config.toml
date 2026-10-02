@@ -3,6 +3,10 @@ mode = "dark"
 source = "builtin"
 builtin = "Kanagawa"
 
+[theme.templates]
+enable_builtin_templates = true
+builtin_ids = [ "foot" "niri" "helix" ]
+
 [bar]
 position = "right"
 density = "comfortable"

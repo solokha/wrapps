@@ -1,11 +1,11 @@
 { pkgs, ... }:
 let
-  cfg = pkgs.writeText "foot.ini" ''
+  cfg = pkgs.writeText "foot.ini.tmpl" ''
     [main]
     term=xterm-256color
     font=FiraCode Nerd Font:size=15
     pad=8x8 center
-    include=~/.config/foot/themes/noctalia
+    include=__THEME__
 
     [scrollback]
     lines=50000
@@ -56,5 +56,8 @@ pkgs.writeShellScriptBin "foot" ''
     cat ${fallbackTheme} >"$theme"
   fi
 
-  exec ${pkgs.foot}/bin/foot --config ${cfg} "$@"
+  conf="''${XDG_RUNTIME_DIR:-/tmp}/foot-wrapps-$(id -u).ini"
+  sed "s|__THEME__|$theme|" ${cfg} >"$conf"
+
+  exec ${pkgs.foot}/bin/foot --config "$conf" "$@"
 ''
