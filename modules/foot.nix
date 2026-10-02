@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   cfg = pkgs.writeText "foot.ini.tmpl" ''
     [main]
     term=xterm-256color
@@ -47,17 +46,17 @@ let
     cursor=f2ecbc 43436c
   '';
 in
-pkgs.writeShellScriptBin "foot" ''
-  theme_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/foot/themes"
-  theme="$theme_dir/noctalia"
+  pkgs.writeShellScriptBin "foot" ''
+    theme_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/foot/themes"
+    theme="$theme_dir/noctalia"
 
-  if [ ! -f "$theme" ]; then
-    mkdir -p "$theme_dir"
-    cat ${fallbackTheme} >"$theme"
-  fi
+    if [ ! -f "$theme" ]; then
+      mkdir -p "$theme_dir"
+      cat ${fallbackTheme} >"$theme"
+    fi
 
-  conf="''${XDG_RUNTIME_DIR:-/tmp}/foot-wrapps-$(id -u).ini"
-  sed "s|__THEME__|$theme|" ${cfg} >"$conf"
+    conf="''${XDG_RUNTIME_DIR:-/tmp}/foot-wrapps-$(id -u).ini"
+    sed "s|__THEME__|$theme|" ${cfg} >"$conf"
 
-  exec ${pkgs.foot}/bin/foot --config "$conf" "$@"
-''
+    exec ${pkgs.foot}/bin/foot --config "$conf" "$@"
+  ''

@@ -1,2 +1,2 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 pkgs.unstable.noctalia

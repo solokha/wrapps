@@ -1,8 +1,8 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 pkgs.symlinkJoin {
   name = "nh-wrapped";
-  paths = [ pkgs.nh ];
-  nativeBuildInputs = [ pkgs.makeWrapper ];
+  paths = [pkgs.nh];
+  nativeBuildInputs = [pkgs.makeWrapper];
   postBuild = ''
     wrapProgram $out/bin/nh \
       --run '

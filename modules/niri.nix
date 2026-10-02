@@ -1,5 +1,9 @@
-{ pkgs, lib, self, ... }:
-let
+{
+  pkgs,
+  lib,
+  self,
+  ...
+}: let
   terminal = "${self.packages.${pkgs.stdenv.hostPlatform.system}.foot}/bin/foot";
   launcher = "${self.packages.${pkgs.stdenv.hostPlatform.system}.fuzzel}/bin/fuzzel";
   noctalia = "${self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia}/bin/noctalia";
@@ -117,12 +121,12 @@ let
     }
   '';
 in
-pkgs.symlinkJoin {
-  name = "niri-wrapped";
-  paths = [ pkgs.niri ];
-  nativeBuildInputs = [ pkgs.makeWrapper ];
-  meta.mainProgram = "niri";
-  postBuild = ''
-    wrapProgram $out/bin/niri --add-flags "--config ${cfg}"
-  '';
-}
+  pkgs.symlinkJoin {
+    name = "niri-wrapped";
+    paths = [pkgs.niri];
+    nativeBuildInputs = [pkgs.makeWrapper];
+    meta.mainProgram = "niri";
+    postBuild = ''
+      wrapProgram $out/bin/niri --add-flags "--config ${cfg}"
+    '';
+  }

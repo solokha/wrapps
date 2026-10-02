@@ -1,8 +1,11 @@
-{ pkgs, inputs, self }:
-let
+{
+  pkgs,
+  inputs,
+  self,
+}: let
   system = pkgs.stdenv.hostPlatform.system;
 
-  tools = import ./packages.nix { inherit pkgs; };
+  tools = import ./packages.nix {inherit pkgs;};
 
   wrapped = [
     self.packages.${system}.helix
@@ -156,8 +159,8 @@ let
     exec ${denv}/bin/denv "$@"
   '';
 in
-pkgs.symlinkJoin {
-  name = "env";
-  paths = tools ++ wrapped ++ [ denv shell agent askpass sshconfig ];
-  meta.mainProgram = "denv";
-}
+  pkgs.symlinkJoin {
+    name = "env";
+    paths = tools ++ wrapped ++ [denv shell agent askpass sshconfig];
+    meta.mainProgram = "denv";
+  }

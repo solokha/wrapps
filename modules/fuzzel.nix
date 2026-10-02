@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 pkgs.writeShellScriptBin "fuzzel" ''
   theme="''${XDG_CONFIG_HOME:-$HOME/.config}/foot/themes/noctalia"
   config="$(mktemp)"

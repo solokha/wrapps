@@ -1,4 +1,8 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  ...
+}:
 inputs.nix-wrapper-modules.lib.wrapPackage {
   inherit pkgs;
   package = pkgs.zellij;

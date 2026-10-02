@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
   extraPolicies = {
     DisableTelemetry = true;
@@ -32,7 +32,7 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
 
     SearchEngines = {
       Default = "DuckDuckGo";
-      Remove = [ "Amazon.com" "Bing" "eBay" "Google" "Wikipedia (en)" ];
+      Remove = ["Amazon.com" "Bing" "eBay" "Google" "Wikipedia (en)"];
     };
 
     Homepage = {

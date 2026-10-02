@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 pkgs.symlinkJoin {
   name = "nixos-anywhere-lab";
   paths = [
