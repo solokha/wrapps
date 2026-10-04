@@ -54,6 +54,13 @@
 
     chmod 600 "$cfg"
     printf 'добавлен блок для FIDO2-ключей в %s\n' "$cfg" >&2
+
+    effective="$(ssh -G -F "$cfg" github.com 2>/dev/null | awk '/^identitiesonly /{print $2; exit}')"
+    if [ "$effective" != "yes" ]; then
+      printf 'ВНИМАНИЕ: IdentitiesOnly не применился (effective=%s).\n' "$effective" >&2
+      printf 'Выше в %s есть другой блок с IdentitiesOnly — он имеет приоритет.\n' "$cfg" >&2
+      printf 'Ключи добавлены, но ssh будет перебирать весь агент.\n' >&2
+    fi
   '';
 
   agent = pkgs.writeShellScriptBin "wrapps-agent" ''
