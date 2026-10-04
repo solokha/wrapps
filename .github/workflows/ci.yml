@@ -15,4 +15,4 @@ jobs:
             accept-flake-config = true
       - run: nix flake check
       - run: nix build .#env .#desktop
-      - run: nix fmt -- . --fail-on-change
+      - run: nix fmt -- --check .
