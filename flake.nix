@@ -5,6 +5,7 @@
     self,
     nixpkgs,
     nixpkgs-unstable,
+    nixpkgs-master,
     nix-wrapper-modules,
     ...
   } @ inputs: let
@@ -101,6 +102,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";

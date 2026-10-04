@@ -5,6 +5,10 @@ in {
     inherit system;
     config.allowUnfree = true;
   };
+  master = import inputs.nixpkgs-master {
+    inherit system;
+    config.allowUnfree = true;
+  };
   wrapps = {
     zellij = inputs.self.packages.${system}.zellij;
     helix = inputs.self.packages.${system}.helix;
