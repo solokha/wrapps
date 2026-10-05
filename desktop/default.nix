@@ -15,11 +15,38 @@ in
     log() { printf 'desktop: %s\n' "$*"; }
 
     noctalia_config_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/noctalia"
+    noctalia_config="$noctalia_config_dir/config.toml"
+    noctalia_origin="$noctalia_config_dir/.origin"
     mkdir -p "$noctalia_config_dir"
-    if [ ! -f "$noctalia_config_dir/config.toml" ]; then
-      if ! cp ${../noctalia/config.toml} "$noctalia_config_dir/config.toml"; then
+
+    # Конфиг раскладываем не только когда его нет, иначе правка в флейке не
+    # доезжает до машин, где конфиг уже разложен: guard «файла нет» вечно
+    # оставляет старую сборку из /nix/store. `.origin` — копия того, что мы
+    # положили в прошлый раз. Совпадает с ним — пользователь не трогал,
+    # обновляем. Разошёлся — файл пользовательский, не трогаем.
+    deploy_config() {
+      # install, а не cp: файлы из /nix/store read-only, и cp тащит этот режим,
+      # после чего конфиг нельзя ни перезаписать, ни отредактировать руками.
+      if ! install -m 644 ${../noctalia/config.toml} "$noctalia_config"; then
         log "не удалось положить конфиг noctalia — продолжаем без него"
+        return 0
       fi
+      install -m 644 ${../noctalia/config.toml} "$noctalia_origin" 2>/dev/null || true
+    }
+
+    if [ ! -f "$noctalia_config" ]; then
+      deploy_config
+    elif [ ! -f "$noctalia_origin" ]; then
+      # конфиг из прежней версии desktop, где .origin не вёлся — не знаем,
+      # трогал ли его пользователь, поэтому прежнее содержимое сохраняем
+      if install -m 644 "$noctalia_config" "$noctalia_config_dir/config.toml.bak"; then
+        log "config.toml без .origin (прежний desktop) — прежнее содержимое в config.toml.bak"
+      fi
+      deploy_config
+    elif [ "$(cat "$noctalia_config")" = "$(cat "$noctalia_origin")" ]; then
+      deploy_config
+    else
+      log "config.toml изменён вручную — оставляю как есть"
     fi
 
     if [ -n "''${WAYLAND_DISPLAY:-}" ] || [ -n "''${DISPLAY:-}" ]; then
