@@ -72,6 +72,16 @@
       dialog=""
     fi
 
+    # В pidfile кладём признак, а не путь к диалогу. Путь — store-путь, он
+    # меняется при каждом обновлении nixpkgs и различается между сборками
+    # wrapps, поэтому агент из старой сборки сравнивал его со своим и решал,
+    # что диалог «другой», пересоздавая живой агент на ровном месте. Для
+    # ssh-agent важно только одно: умеет ли он спросить PIN в окне.
+    case "$dialog" in
+      "") dialog_kind="нет окна PIN" ;;
+      *) dialog_kind="окно PIN" ;;
+    esac
+
     sock="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wrapps-agent.sock"
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
@@ -93,8 +103,8 @@
         *) why="pid=$pid занят не агентом (cmdline: ''${cmd:-пусто})"; return 1 ;;
       esac
       want="$(sed -n '2p' "$pidfile" 2>/dev/null || true)"
-      if [ "$want" != "$dialog" ]; then
-        why="поднят с другим диалогом (в pidfile: ''${want:-пусто}, нужен: ''${dialog:-пусто})"
+      if [ "$want" != "$dialog_kind" ]; then
+        why="диалог не тот (в pidfile: ''${want:-пусто}, сейчас: $dialog_kind)"
         return 1
       fi
       return 0
@@ -117,7 +127,7 @@
         echo "не удалось поднять агента: $out" >&2
         exit 1
       fi
-      printf '%s\n%s\n' "$pid" "$dialog" >"$pidfile"
+      printf '%s\n%s\n' "$pid" "$dialog_kind" >"$pidfile"
     fi
 
     export SSH_AUTH_SOCK="$sock"
