@@ -76,27 +76,34 @@
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
 
+    # usable() возвращает 1 и записывает причину в $why. Причин четыре, и
+    # раньше сообщение подставляло одну из них на все случаи — из-за этого
+    # негодный агент выдавался за «поднят с другим диалогом».
+    why=""
     usable() {
       local pid cmd want
       [ -S "$sock" ] || return 1
-      [ -f "$pidfile" ] || return 1
-      IFS= read -r pid <"$pidfile" || return 1
-      [ -n "$pid" ] || return 1
-      kill -0 "$pid" 2>/dev/null || return 1
+      [ -f "$pidfile" ] || { why="нет pidfile"; return 1; }
+      IFS= read -r pid <"$pidfile" || { why="pidfile не читается"; return 1; }
+      [ -n "$pid" ] || { why="в pidfile нет pid"; return 1; }
+      kill -0 "$pid" 2>/dev/null || { why="агент pid=$pid не отвечает"; return 1; }
       cmd="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
       case "$cmd" in
         ssh-agent*" -a $sock"*) ;;
-        *) return 1 ;;
+        *) why="pid=$pid занят не агентом (cmdline: ''${cmd:-пусто})"; return 1 ;;
       esac
       want="$(sed -n '2p' "$pidfile" 2>/dev/null || true)"
-      [ "$want" = "$dialog" ] || return 1
+      if [ "$want" != "$dialog" ]; then
+        why="поднят с другим диалогом (в pidfile: ''${want:-пусто}, нужен: ''${dialog:-пусто})"
+        return 1
+      fi
       return 0
     }
 
     if ! usable; then
       if [ -S "$sock" ]; then
         SSH_AUTH_SOCK="$sock" ssh-agent -k >/dev/null 2>&1 || true
-        echo "старый агент на $sock снят: он поднят с другим диалогом" >&2
+        echo "старый агент на $sock снят: ''${why}" >&2
       fi
       rm -f "$sock" "$pidfile"
 
