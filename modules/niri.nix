@@ -127,6 +127,13 @@ in
     nativeBuildInputs = [pkgs.makeWrapper];
     meta.mainProgram = "niri";
     postBuild = ''
-      wrapProgram $out/bin/niri --add-flags "--config ${cfg}"
+      mv $out/bin/niri $out/bin/.niri-real
+      printf '%s\n' \
+        '#!${pkgs.bash}/bin/bash' \
+        'set -eu' \
+        'export NIRI_CONFIG=${cfg}' \
+        'exec '"$out"'/bin/.niri-real "$@"' \
+        >$out/bin/niri
+      chmod +x $out/bin/niri
     '';
   }
