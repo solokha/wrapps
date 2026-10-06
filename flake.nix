@@ -72,12 +72,27 @@
         pkgs,
         ...
       }: {
-        environment.systemPackages = [
-          self.packages.${pkgs.stdenv.hostPlatform.system}.env
-          self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
-          self.packages.${pkgs.stdenv.hostPlatform.system}.firefox
-          self.packages.${pkgs.stdenv.hostPlatform.system}.foot
-        ];
+        environment.systemPackages =
+          (with pkgs; [
+            # Файловый менеджер. GTK3, поэтому подхватывает
+            # ~/.config/gtk-3.0/gtk.css, который noctalia генерит из палитры.
+            # Обёртка не нужна: путь конфига у thunar по умолчанию, настройки
+            # пользовательские. file-roller нужен как движок архивов,
+            # gvfs — сеть и носители, thunar-volman + udisks — автоподключение,
+            # xdg-desktop-portal-gtk — файловые диалоги для всех GTK-приложений.
+            thunar
+            file-roller
+            gvfs
+            thunar-volman
+            udisks
+            xdg-desktop-portal-gtk
+          ])
+          ++ [
+            self.packages.${pkgs.stdenv.hostPlatform.system}.env
+            self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
+            self.packages.${pkgs.stdenv.hostPlatform.system}.firefox
+            self.packages.${pkgs.stdenv.hostPlatform.system}.foot
+          ];
       };
 
       desktop = {
