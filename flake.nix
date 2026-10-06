@@ -93,6 +93,14 @@
             self.packages.${pkgs.stdenv.hostPlatform.system}.firefox
             self.packages.${pkgs.stdenv.hostPlatform.system}.foot
           ];
+
+        # GIO ищет свои модули в двух местах: в каталоге, скомпилированном в
+        # glib (у нас он пуст), и в $XDG_DATA_DIRS/gio/modules (на машине его
+        # нет). gvfs же кладёт их в $out/lib/gio/modules — мимо обоих. Без
+        # этой переменной не грузится весь gvfs, а не только сеть: в файловом
+        # менеджере нет ни smb://, ни Корзины, ни автоподключения носителей
+        # (проверено: gio info trash:/// → «Operation not supported»).
+        environment.sessionVariables.GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules";
       };
 
       desktop = {
