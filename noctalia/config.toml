@@ -11,9 +11,18 @@ shell_mode = "auto"
 enable_builtin_templates = true
 builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "helix", "niri", "qt", "starship" ]
 
-# community-шаблоны приезжают из ~/.local/state/noctalia/plugins/sources/community,
-# который noctalia скачивает при старте: без сети эти не появятся. Клиентов,
-# которых нет в системе, noctalia пропускает сама ("client not installed").
+# community-шаблоны берутся из git-выкачки
+# ~/.local/state/noctalia/plugins/sources/community, которую noctalia обновляет
+# при старте (в журнале — plugins.git fetch origin на каждом запуске). Каталог
+# не переживает откат корня, но вынесен в cache-контракт инфра, поэтому после
+# первой загрузки он есть и без сети.
+#
+# Шаблон может не отработать по двум разным причинам, и обе видны в журнале:
+#   [template_engine] skipping template … (client not installed)
+#   [template_engine] failed to open template input …
+# Первая — клиента нет в системе, вторая — нет выкачанного шаблона. Поэтому
+# клиентов, которых нет в системе, убирать отсюда не нужно: noctalia
+# пропустит их сама.
 community_ids = [ "fastfetch", "fuzzel", "fzf", "tmux" ]
 
 [bar]

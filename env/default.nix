@@ -211,7 +211,7 @@
     # btop и tmux: noctalia правит существующие конфиги, а не создаёт их — без
     # файла её apply.sh падает с «config not found», и тема остаётся
     # непрочитанной. Файлы создаём мы, по правилу «если нет»; дальше в каждом
-    # nocturne владеет ровно одной строкой.
+    # noctalia владеет ровно одной строкой.
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf" ./btop.conf}
 
     ${deployConfig "\${HOME}/.tmux.conf" ./tmux.conf}
