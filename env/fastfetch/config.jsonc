@@ -1,0 +1,49 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+
+  "logo": {
+    "type": "builtin",
+    "source": "NixOS"
+  },
+
+  "modules": [
+    "break",
+    "keys",
+    "title",
+    "separator",
+    "break",
+
+    "os",
+    "kernel",
+    "uptime",
+    "packages",
+    "host",
+    "board",
+    "bios",
+    "init",
+    "locale",
+
+    "break",
+
+    "wm",
+    "wmtheme",
+    "theme",
+    "terminal",
+    "terminalfont",
+    "shell",
+    "editor",
+
+    "break",
+
+    "cpu",
+    "gpu",
+    "memory",
+    "swap",
+    "disk",
+    "zpool",
+
+    "break",
+
+    "colors"
+  ]
+}

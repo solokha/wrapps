@@ -169,13 +169,45 @@
       ${sshconfig}/bin/wrapps-ssh-config >/dev/null 2>&1 || true
     fi
 
+    # Тема fzf от noctalia — это набор --color в FZF_DEFAULT_OPTS, файл
+    # нужно подключить в шелл. Обёртка тут не нужна: у fzf нет ни конфига
+    # по фиксированному пути, ни режима без переменных, всё решает env.
+    _fzf_theme="''${XDG_CONFIG_HOME:-$HOME/.config}/fzf/themes/noctalia.sh"
+    if [ -f "$_fzf_theme" ]; then
+      # shellcheck source=/dev/null
+      . "$_fzf_theme"
+    fi
+    unset _fzf_theme
+
     export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
+  '';
+
+  # Раскладка конфигов по правилу «если нет»: существующий пользовательский
+  # файл не трогаем. Это тот же приём, что в modules/zed.nix и modules/foot.nix.
+  deployConfig = target: content: ''
+    if [ ! -f "${target}" ]; then
+      mkdir -p "$(dirname "${target}")"
+      if ! install -m 644 ${content} "${target}"; then
+        printf 'env: не удалось положить %s\n' "${target}" >&2
+      fi
+    fi
   '';
 
   denv = pkgs.writeShellScriptBin "denv" ''
     export SHELL="${pkgs.bash}/bin/bash"
     export EDITOR="${self.packages.${system}.helix}/bin/hx"
     export PATH="${pkgs.lib.makeBinPath (tools ++ wrapped)}:$PATH"
+
+    # starship: файл обязан лежать в ~/.config/starship.toml, это его путь по
+    # умолчанию. noctalia потом дописывает в него свою палитру по маркерам,
+    # поэтому он и создаётся здесь, а не обёрткой.
+    ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml" ./starship.toml}
+
+    # fastfetch: тот же путь по умолчанию. Шаблон noctalia сливает цвета в
+    # этот файл через jq, поэтому он обязан быть строгим JSON без комментариев
+    # — в нём их нет специально.
+    ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc" ./fastfetch/config.jsonc}
+
     exec ${pkgs.bash}/bin/bash --rcfile ${envrc} "$@"
   '';
 

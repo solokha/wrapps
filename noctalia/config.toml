@@ -1,16 +1,32 @@
 [theme]
-mode = "dark"
-source = "builtin"
-builtin = "Kanagawa"
+# Палитра community, а не builtin. Источник правды — noctalia GUI, но на
+# машине без ~/.local/state/noctalia/settings.toml этот файл и есть всё, что
+# читает оболочка, поэтому он должен быть полным.
+mode = "auto"
+source = "community"
+community_palette = "Everforest Alt"
+shell_mode = "auto"
 
 [theme.templates]
 enable_builtin_templates = true
-builtin_ids = [ "foot", "niri", "helix" ]
+builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "helix", "niri", "qt", "starship" ]
+
+# community-шаблоны приезжают из ~/.local/state/noctalia/plugins/sources/community,
+# который noctalia скачивает при старте: без сети эти не появятся. Клиентов,
+# которых нет в системе, noctalia пропускает сама ("client not installed").
+community_ids = [ "fastfetch", "fuzzel", "fzf", "tmux" ]
 
 [bar]
 position = "right"
 density = "comfortable"
 
 [wallpaper]
+# Путь к обоям намеренно не задан: путь из пакета — это store-путь конкретной
+# сборки noctalia, он исчезает при сборке мусора.
 enabled = true
 fill_mode = "crop"
+
+[lockscreen_widgets]
+# enabled = false достаточно. Список widget_order и координаты cx/cy/placement_*
+# не переносим: это геометрия конкретных мониторов, и в wrapps ей не место.
+enabled = false

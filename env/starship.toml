@@ -1,0 +1,77 @@
+# Базовый промпт starship для #env.
+#
+# Файл раскладывается в ~/.config/starship.toml по правилу «если нет»:
+# существующий не трогаем (соглашение wrapps — не перезаписывать
+# пользовательские конфиги). noctalia при этом дописывает свою палитру в
+# свой блок по маркерам, а тело конфига сохраняет, так что после её
+# запуска этот файл и ~/.config/starship.toml разойдутся — это ожидаемо.
+#
+# Палитра ("palette = \"noctalia\"") здесь не задана: её владеет noctalia,
+# см. noctalia/config.toml. Без неё starship берёт свои цвета по умолчанию.
+#
+# Набор секций проверен `starship explain` против starship 1.25.1 из
+# env/packages.nix: language, tmux, nix_version и ssh_connection в этой
+# сборке не зарегистрированы, и starship ругается на них как на Unknown key.
+# Секция называется time, а не clock — clock появился в более поздних версиях.
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Время. Формат 24-часовой: смена am/pm на каждом промпте лишняя.
+[time]
+disabled = false
+format = "15:04"
+
+# Формат символа @user — отдельно от цвета и user_name, иначе весь сегмент
+# красится в один цвет и от @ остаётся мусорный пробел.
+[username]
+format = " [$user]($style)"
+
+# Имя хоста: на лаборатории их три (rover, atlas, valet), и по промпту надо
+# понимать, где вы находитесь. Показываем символ (@), а не слово host.
+[hostname]
+ssh_only = false
+format = "[@]($style) "
+style = "hostname"
+
+# Рабочий каталог. Обрезаем до трёх компонентов и привязываем к корню
+# репозитория: в ~/work/laba рядом два репозитория, полный путь съедает
+# строку и ничего не сообщает.
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "path"
+
+# Номер nix-окружения: в wrapps часто сборка из --override-input, ошибки
+# «не найден пакет» почти всегда от неверного окружения.
+[nix_shell]
+symbol = "nix"
+style = "nix_shell"
+
+# Git. Подпись FIDO2 и conventional commits — правило infra, поэтому статус
+# ветки и индекс показываем. Метку времени коммитов («быстро») не смотрим:
+# она рисует мердж-базу и замедляет промпт в больших репозиториях.
+[git_branch]
+symbol = " "
+style = "branch"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "git"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "="
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?${count}"
+stashed = "$${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✗${count}"
+
+# Символ промпта: в wrapps это bash (env/default.nix), поэтому стрелка без
+# доллара — «чистая» строка.
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vicmd_symbol = "[❮](bold yellow)"
