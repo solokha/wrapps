@@ -16,18 +16,6 @@ in
 
     noctalia_config_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/noctalia"
     mkdir -p "$noctalia_config_dir"
-    # Раскладываем всегда, а не только когда файла нет: иначе правка конфига во
-    # флейке не доезжает до машины, где конфиг уже разложен. Через install, а не
-    # cp: файлы из /nix/store read-only, и cp тащит этот режим, после чего
-    # конфиг нельзя ни обновить, ни отредактировать руками.
-    #
-    # Оговорка: noctalia читает config.toml, а затем перекрывает его
-    # ~/.local/state/noctalia/settings.toml («state-dir settings.toml
-    # overrides»). Пока settings.toml существует, наш файл не решает. Поэтому
-    # он убран из персиста в infra/modules/features/preservation.nix — после
-    # отката корня settings.toml не возвращается, и конфиг из #desktop
-    # действует. В пределах одной сессии правка GUI снова создаёт settings.toml
-    # и перекрывает дефолт до переноса.
     if ! install -m 644 ${../noctalia/config.toml} "$noctalia_config_dir/config.toml"; then
       log "не удалось положить конфиг noctalia — продолжаем без него"
     fi

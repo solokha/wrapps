@@ -72,11 +72,6 @@
       dialog=""
     fi
 
-    # В pidfile кладём признак, а не путь к диалогу. Путь — store-путь, он
-    # меняется при каждом обновлении nixpkgs и различается между сборками
-    # wrapps, поэтому агент из старой сборки сравнивал его со своим и решал,
-    # что диалог «другой», пересоздавая живой агент на ровном месте. Для
-    # ssh-agent важно только одно: умеет ли он спросить PIN в окне.
     case "$dialog" in
       "") dialog_kind="нет окна PIN" ;;
       *) dialog_kind="окно PIN" ;;
@@ -86,9 +81,6 @@
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
 
-    # usable() возвращает 1 и записывает причину в $why. Причин четыре, и
-    # раньше сообщение подставляло одну из них на все случаи — из-за этого
-    # негодный агент выдавался за «поднят с другим диалогом».
     why=""
     usable() {
       local pid cmd want
@@ -169,12 +161,8 @@
       ${sshconfig}/bin/wrapps-ssh-config >/dev/null 2>&1 || true
     fi
 
-    # Тема fzf от noctalia — это набор --color в FZF_DEFAULT_OPTS, файл
-    # нужно подключить в шелл. Обёртка тут не нужна: у fzf нет ни конфига
-    # по фиксированному пути, ни режима без переменных, всё решает env.
     _fzf_theme="''${XDG_CONFIG_HOME:-$HOME/.config}/fzf/themes/noctalia.sh"
     if [ -f "$_fzf_theme" ]; then
-      # shellcheck source=/dev/null
       . "$_fzf_theme"
     fi
     unset _fzf_theme
@@ -196,20 +184,10 @@
     export EDITOR="${self.packages.${system}.helix}/bin/hx"
     export PATH="${pkgs.lib.makeBinPath (tools ++ wrapped)}:$PATH"
 
-    # starship: файл обязан лежать в ~/.config/starship.toml, это его путь по
-    # умолчанию. noctalia потом дописывает в него свою палитру по маркерам,
-    # поэтому он и создаётся здесь, а не обёрткой.
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml" ./starship.toml}
 
-    # fastfetch: тот же путь по умолчанию. Шаблон noctalia сливает цвета в
-    # этот файл через jq, поэтому он обязан быть строгим JSON без комментариев
-    # — в нём их нет специально.
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc" ./fastfetch/config.jsonc}
 
-    # btop и tmux: noctalia правит существующие конфиги, а не создаёт их — без
-    # файла её apply.sh падает с «config not found», и тема остаётся
-    # непрочитанной. Файлы создаём мы, по правилу «если нет»; дальше в каждом
-    # noctalia владеет ровно одной строкой.
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf" ./btop.conf}
 
     ${deployConfig "\${HOME}/.tmux.conf" ./tmux.conf}
