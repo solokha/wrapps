@@ -74,16 +74,24 @@
       }: {
         environment.systemPackages =
           (with pkgs; [
-            # Файловый менеджер. GTK3, поэтому подхватывает
-            # ~/.config/gtk-3.0/gtk.css, который noctalia генерит из палитры.
-            # Обёртка не нужна: путь конфига у thunar по умолчанию, настройки
-            # пользовательские. file-roller нужен как движок архивов,
-            # gvfs — сеть и носители, thunar-volman + udisks — автоподключение,
-            # xdg-desktop-portal-gtk — файловые диалоги для всех GTK-приложений.
-            thunar
-            file-roller
+            # Файловый менеджер — far2l, порт FAR Manager. Собран без GUI
+            # (см. overlay.nix): TUI, GTK в дереве нет, и вопрос оформления
+            # не возникает — палитра noctalia сюда не доходит и не должна.
+            #
+            # Архивы встроенные, отдельный архиватор не нужен: libarchive даёт
+            # просмотр архива изнутри, а 7z/zip/tar/gzip/xz обёртка от nixpkgs
+            # кладёт в PATH. Поэтому file-roller здесь нет: он тянул за собой
+            # nautilus, то есть целый второй файловый менеджер, и 1.2 GiB
+            # замыкания, — а толку от него было чуть больше, чем от far2l.
+            #
+            # thunar тоже ушёл: GTK3, поэтому палитра noctalia до него не
+            # доходит вообще, а его объём 337 MiB больше, чем у far2l.
+            #
+            # Сеть — через gvfs: smb:// и носители монтируются в
+            # /run/user/1000/gvfs, откуда far2l их видит. Своя сеть в far2l
+            # отключена (withNetRocks=false), она стоила бы 340 MiB.
+            far2l
             gvfs
-            thunar-volman
             udisks
             xdg-desktop-portal-gtk
           ])
