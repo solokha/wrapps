@@ -12,10 +12,6 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     SearchSuggestEnabled = true;
     TranslateEnabled = false;
 
-    # Расширения: всё, кроме перечисленного, запрещено. Список и политика
-    # перенесены из прежнего infra/modules/desktop/firefox.nix (коммит 2f92a05),
-    # который при переезде конфигурации был потерян. Firefox ставит их сам при
-    # старте, руками ничего делать не нужно.
     ExtensionSettings = {
       "*" = {
         installation_mode = "blocked";

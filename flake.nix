@@ -74,13 +74,6 @@
       }: {
         environment.systemPackages =
           (with pkgs; [
-            # Файлового менеджера нет намеренно. thunar (GTK3, 337 MiB) и
-            # file-roller (1.2 GiB замыкания, и он тянет за собой целый
-            # nautilus) убраны: первый не оформлялся, второй тянул лишнее.
-            # Кандидаты на замену — far2l без GUI (254 MiB, встроенные
-            # архивы) и vifm (55.5 MiB, только ncurses) — отвергнуты.
-            # Файлы и smb:// остаются доступны через консоль и через
-            # смонтированное в /run/user/1000/gvfs.
             gvfs
             udisks
             xdg-desktop-portal-gtk
@@ -92,12 +85,6 @@
             self.packages.${pkgs.stdenv.hostPlatform.system}.foot
           ];
 
-        # GIO ищет свои модули в двух местах: в каталоге, скомпилированном в
-        # glib (у нас он пуст), и в $XDG_DATA_DIRS/gio/modules (на машине его
-        # нет). gvfs же кладёт их в $out/lib/gio/modules — мимо обоих. Без
-        # этой переменной не грузится весь gvfs, а не только сеть: в файловом
-        # менеджере нет ни smb://, ни Корзины, ни автоподключения носителей
-        # (проверено: gio info trash:/// → «Operation not supported»).
         environment.sessionVariables.GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules";
       };
 

@@ -182,8 +182,6 @@
     export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
   '';
 
-  # Раскладка конфигов по правилу «если нет»: существующий пользовательский
-  # файл не трогаем. Это тот же приём, что в modules/zed.nix и modules/foot.nix.
   deployConfig = target: content: ''
     if [ ! -f "${target}" ]; then
       mkdir -p "$(dirname "${target}")"
