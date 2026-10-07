@@ -98,8 +98,8 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     lockPref("privacy.globalprivacycontrol.functionality.enabled", true);
     lockPref("intl.accept_languages", "ru, en-US, en");
 
-    # vimium из списка force_installed: показывать подсказки, не разворачивать
-    # панели настроек, и не мешать раскладке.
+    // vimium из списка force_installed: показывать подсказки, не разворачивать
+    // панели настроек, и не мешать раскладке.
     pref("extensions.vimiumc.showAdvanced", false);
     pref("extensions.vimiumc.ignoreKeyboardLayout", true);
   '';
