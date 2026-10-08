@@ -1,9 +1,3 @@
-# Обёртка владеет поведением лаунчера (геометрия, шрифт, терминал, слой),
-# палитрой — noctalia: её шаблон fuzzel пишет $XDG_CONFIG_HOME/fuzzel/themes/noctalia,
-# а apply.sh рядом с ним добавляет include в fuzzel.ini.
-#
-# Раньше цвета собирались awk-ом из foot-темы. Это связывало лаунчер с foot
-# через случайное совпадение палитр и делало шаблон fuzzel бесполезным.
 {pkgs, ...}:
 pkgs.writeShellScriptBin "fuzzel" ''
   config="$(mktemp)"
