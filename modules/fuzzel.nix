@@ -1,10 +1,15 @@
+# Обёртка владеет поведением лаунчера (геометрия, шрифт, терминал, слой),
+# палитрой — noctalia: её шаблон fuzzel пишет $XDG_CONFIG_HOME/fuzzel/themes/noctalia,
+# а apply.sh рядом с ним добавляет include в fuzzel.ini.
+#
+# Раньше цвета собирались awk-ом из foot-темы. Это связывало лаунчер с foot
+# через случайное совпадение палитр и делало шаблон fuzzel бесполезным.
 {pkgs, ...}:
 pkgs.writeShellScriptBin "fuzzel" ''
-  theme="''${XDG_CONFIG_HOME:-$HOME/.config}/foot/themes/noctalia"
   config="$(mktemp)"
   trap 'rm -f "$config"' EXIT
 
-  cat >"$config" <<'EOF'
+  cat >"$config" <<EOF
   [main]
   font=FiraCode Nerd Font:size=14
   terminal=foot -e
@@ -18,36 +23,9 @@ pkgs.writeShellScriptBin "fuzzel" ''
   dpi-aware=yes
   show-actions=yes
   layer=overlay
-  EOF
 
-  get() {
-    awk -F= -v k="$1" '$1==k { gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; exit }' "$theme"
-  }
-
-  if [ -f "$theme" ]; then
-    bg="$(get background)"
-    fg="$(get foreground)"
-    r0="$(get regular0)"
-    r3="$(get regular3)"
-    r4="$(get regular4)"
-    b0="$(get bright0)"
-    cat >>"$config" <<EOF
-  [colors]
-  background=''${bg}ee
-  text=''${fg}ff
-  prompt=''${r4}ff
-  placeholder=''${b0}ff
-  input=''${fg}ff
-  match=''${r3}ff
-  selection=''${r0}ff
-  selection-text=''${fg}ff
-  selection-match=''${r3}ff
-  border=''${r4}ee
+  include=''${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/themes/noctalia
   EOF
-  else
-    echo "noctalia theme not found at $theme" >&2
-    exit 1
-  fi
 
   exec ${pkgs.fuzzel}/bin/fuzzel --config "$config" "$@"
 ''

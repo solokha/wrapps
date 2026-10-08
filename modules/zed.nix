@@ -1,6 +1,11 @@
 {pkgs, ...}: let
   settings = pkgs.writeText "settings.json" ''
     {
+      "theme": {
+        "mode": "system",
+        "light": "Noctalia Light",
+        "dark": "Noctalia Dark"
+      },
       "ui_font_size": 18,
       "buffer_font_size": 18,
       "buffer_font_family": "FiraCode Nerd Font",
