@@ -45,19 +45,8 @@ pkgs.writeShellScriptBin "fuzzel" ''
   border=''${r4}ee
   EOF
   else
-    cat >>"$config" <<'EOF'
-  [colors]
-  background=f2ecbcf2
-  text=545464ff
-  prompt=4d699bff
-  placeholder=8a8980ff
-  input=545464ff
-  match=77713fff
-  selection=1f1f28ee
-  selection-text=545464ff
-  selection-match=77713fff
-  border=4d699bee
-  EOF
+    echo "noctalia theme not found at $theme" >&2
+    exit 1
   fi
 
   exec ${pkgs.fuzzel}/bin/fuzzel --config "$config" "$@"

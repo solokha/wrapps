@@ -108,7 +108,6 @@
       gaps 5
       focus-ring {
         width 2
-        active-color "#fe8019"
       }
     }
 

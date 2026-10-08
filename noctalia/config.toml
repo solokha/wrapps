@@ -23,7 +23,7 @@ builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "helix", "niri", "qt", "starship
 # Первая — клиента нет в системе, вторая — нет выкачанного шаблона. Поэтому
 # клиентов, которых нет в системе, убирать отсюда не нужно: noctalia
 # пропустит их сама.
-community_ids = [ "fastfetch", "fuzzel", "fzf", "tmux" ]
+community_ids = [ "fastfetch", "fuzzel", "fzf", "tmux", "zed" ]
 
 [bar]
 position = "right"
