@@ -31,25 +31,44 @@
     cfg="$HOME/.ssh/config"
     marker="# wrapps: FIDO2-ключи"
 
+    # Свой блок переписываем с нуля, а не «если нет»: ssh читает пользовательский
+    # конфиг раньше системного, поэтому именно этот блок задаёт порядок
+    # IdentityFile. Блок дописан в конец файла — вырезаем его целиком, иначе он
+    # залипает навсегда (в том числе со старым порядком ключей).
+    if [ -f "$cfg" ] && grep -qF "$marker" "$cfg"; then
+      tmp="$cfg.wrapps.$$"
+      awk '
+        /^# wrapps: FIDO2-ключи$/ { drop=1; next }
+        drop && (/^#/ || /^Host \*$/ || /^  IdentitiesOnly / || /^  IdentityFile /) { next }
+        drop { drop=0 }
+        { print }
+      ' "$cfg" >"$tmp" && cat "$tmp" >"$cfg" && rm -f "$tmp"
+    fi
+
     # ssh складывает IdentityFile из системного и пользовательского конфигов,
     # а не перезаписывает. Если sk-ключи уже перечислены системой, свой блок
     # не нужен — иначе каждый ключ попадёт в перебор дважды. Проверяем файл
     # напрямую: ssh -G -F /dev/null отбрасывает и системный конфиг, поэтому
     # через него это не видно.
     if [ -r /etc/ssh/ssh_config ] && grep -qE '^[[:space:]]*IdentityFile.*(_sk|id_ecdsa_sk|id_ed25519_sk)' /etc/ssh/ssh_config; then
-      printf 'системный ssh_config уже перечисляет sk-ключи — %s не трогаю\n' "$cfg" >&2
+      printf 'системный ssh_config уже перечисляет sk-ключи — блок в %s убран\n' "$cfg" >&2
       exit 0
     fi
 
-    if [ -f "$cfg" ] && grep -qF "$marker" "$cfg"; then
-      exit 0
-    fi
-
+    # Порядок важен: ssh идёт по IdentityFile слева направо и спотыкается на
+    # первом же токене, которого нет под рукой. @clone — тот, что всегда с
+    # собой, поэтому его ключи кладём раньше @alone.
     keys=""
-    for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
-      case "$k" in *.pub) continue ;; esac
-      [ -f "$k" ] || continue
-      keys="$keys\n  IdentityFile $k"
+    for want in clone other; do
+      for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
+        case "$k" in *.pub) continue ;; esac
+        [ -f "$k" ] || continue
+        case "$k" in
+          *@clone) [ "$want" = clone ] || continue ;;
+          *) [ "$want" = other ] || continue ;;
+        esac
+        keys="$keys\n  IdentityFile $k"
+      done
     done
     if [ -z "$keys" ]; then
       printf 'sk-ключей в ~/.ssh нет: cd ~/.ssh && ssh-keygen -K\n' >&2
