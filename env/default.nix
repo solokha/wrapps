@@ -153,6 +153,12 @@
     echo "export SSH_AUTH_SOCK=$sock"
   '';
 
+  # Конфиг atuin кладём в store: atuin читает его из ATUIN_CONFIG_DIR
+  # (см. envrc), а ~/.config/atuin не в пресетах preservation и откатывается
+  # вместе с корнем, поэтому в home ему жить незачем. Источник правды —
+  # atuin.toml.
+  atuinConfig = pkgs.writeTextDir "config.toml" (builtins.readFile ./atuin.toml);
+
   envrc = pkgs.writeText "envrc" ''
     # atuin в bash работает только через интерфейс bash-preexec: сам init лишь
     # дописывает __atuin_preexec/__atuin_precmd в preexec_functions и
@@ -165,6 +171,8 @@
     # starship идёт после bash-preexec: увидев __bp_imported, он регистрируется
     # через precmd_functions, а не перетирает PROMPT_COMMAND.
     eval "$(${pkgs.starship}/bin/starship init bash)"
+
+    export ATUIN_CONFIG_DIR=${atuinConfig}
 
     eval "$(${pkgs.atuin}/bin/atuin init bash --disable-up-arrow)"
 
