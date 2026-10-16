@@ -7,7 +7,7 @@ Portable NixOS environment and wrapped applications.
 ## Quick start
 
 ```bash
-nix run github:solokha/wrapps/dev#env
+nix run github:solokha/wrapps/main#env
 ```
 
 ## Contents
@@ -47,11 +47,11 @@ itself stays on the token.
 
 ```bash
 # Enter environment
-nix run github:solokha/wrapps/dev#env
+nix run github:solokha/wrapps/main#env
 
 # Run specific tool
-nix run github:solokha/wrapps/dev#env -- git status
+nix run github:solokha/wrapps/main#env -- git status
 
 # Desktop environment
-nix run github:solokha/wrapps/dev#desktop
+nix run github:solokha/wrapps/main#desktop
 ```

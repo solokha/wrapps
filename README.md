@@ -7,7 +7,7 @@
 ## Быстрый старт
 
 ```bash
-nix run github:solokha/wrapps/dev#env
+nix run github:solokha/wrapps/main#env
 ```
 
 ## Состав
@@ -47,13 +47,13 @@ mkdir -p ~/.ssh && cd ~/.ssh && ssh-keygen -K
 
 ```bash
 # Войти в окружение
-nix run github:solokha/wrapps/dev#env
+nix run github:solokha/wrapps/main#env
 
 # Запустить конкретный инструмент
-nix run github:solokha/wrapps/dev#env -- git status
+nix run github:solokha/wrapps/main#env -- git status
 
 # Десктоп
-nix run github:solokha/wrapps/dev#desktop
+nix run github:solokha/wrapps/main#desktop
 ```
 
 [English](README.en.md)
