@@ -154,6 +154,16 @@
   '';
 
   envrc = pkgs.writeText "envrc" ''
+    # atuin в bash работает только через интерфейс bash-preexec: сам init лишь
+    # дописывает __atuin_preexec/__atuin_precmd в preexec_functions и
+    # precmd_functions, а вызывает их bash-preexec. Без него ATUIN_HISTORY_ID
+    # остаётся пустым (ATUIN_PREEXEC_BACKEND=<shlvl>:none), __atuin_precmd
+    # выходит на первой же строке, и история не пишется вовсе. Тот же пробел у
+    # NixOS-модуля programs.atuin — он тоже просто делает atuin init.
+    source ${pkgs.bash-preexec}/share/bash/bash-preexec.sh
+
+    # starship идёт после bash-preexec: увидев __bp_imported, он регистрируется
+    # через precmd_functions, а не перетирает PROMPT_COMMAND.
     eval "$(${pkgs.starship}/bin/starship init bash)"
 
     eval "$(${pkgs.atuin}/bin/atuin init bash --disable-up-arrow)"
