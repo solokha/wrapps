@@ -20,6 +20,18 @@ in
       log "не удалось положить конфиг noctalia — продолжаем без него"
     fi
 
+    # starship.toml кладём до старта niri: noctalia применяет свой builtin-шаблон
+    # starship и создаёт файл раньше, после чего «если нет» в denv уже не
+    # срабатывает и промпт остаётся дефолтным. Существующий не трогаем — то же
+    # правило, что у denv.
+    starship_config="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+    if [ ! -f "$starship_config" ]; then
+      mkdir -p "$(dirname "$starship_config")"
+      if ! install -m 644 ${../env/starship.toml} "$starship_config"; then
+        log "не удалось положить конфиг starship — останется дефолтный промпт"
+      fi
+    fi
+
     if [ -n "''${WAYLAND_DISPLAY:-}" ] || [ -n "''${DISPLAY:-}" ]; then
       log "запущено внутри ''${WAYLAND_DISPLAY:-$DISPLAY} — desktop требует чистый tty (greetd/логин)"
       exec ${shell} "$@"
