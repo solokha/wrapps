@@ -10,6 +10,7 @@
   wrapped = [
     self.packages.${system}.helix
     self.packages.${system}.nh
+    self.packages.${system}.opencode
   ];
 
   askpass = pkgs.writeShellScriptBin "wrapps-askpass" ''

@@ -39,6 +39,7 @@
         zellij = callModule "zellij";
         helix = callModule "helix";
         nh = callModule "nh";
+        opencode = callModule "opencode";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
@@ -59,6 +60,7 @@
     }: {
       env = self.packages.${system}.env;
       desktop = self.packages.${system}.desktop;
+      opencode = self.packages.${system}.opencode;
     });
 
     formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
@@ -113,6 +115,10 @@
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

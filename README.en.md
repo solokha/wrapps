@@ -24,6 +24,7 @@ nix run github:solokha/wrapps/main#env
 - Desktop: `niri`, `fuzzel`, `zed`
 - Browser: `firefox`
 - Tools: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`
+- Agent: `opencode` (v2, from `llm-agents.nix`)
 
 ## FIDO2
 
