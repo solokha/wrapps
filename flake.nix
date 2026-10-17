@@ -45,6 +45,7 @@
         zed = callModule "zed";
         niri = callModule "niri";
         firefox = callModule "firefox";
+        tg-web = callModule "tg-web";
         noctalia = import ./noctalia {inherit pkgs;};
         desktop = import ./desktop {inherit pkgs inputs self;};
         nixos-anywhere = callModule "nixos-anywhere";
@@ -61,6 +62,7 @@
       env = self.packages.${system}.env;
       desktop = self.packages.${system}.desktop;
       opencode = self.packages.${system}.opencode;
+      tg-web = self.packages.${system}.tg-web;
     });
 
     formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
@@ -97,6 +99,18 @@
         ...
       }: {
         imports = [self.nixosModules.default];
+
+        # Ссылки tg:// (кнопка «Join Channel» на страницах t.me) отдаются
+        # обработчику из этого же репозитория: Firefox схему не умеет, а
+        # Telegram Web зарегистрировать её себе не может. Регистрация — та же,
+        # что у нативных приложений: .desktop в systemPackages плюс запись в
+        # XDG-базе схем (xdg.mime → /etc/xdg/mimeapps.list). Живёт здесь, а не
+        # в infra: это десктопная интеграция, и Exec указывает на обёрнутый
+        # firefox из wrapps.
+        environment.systemPackages = [
+          self.packages.${pkgs.stdenv.hostPlatform.system}.tg-web
+        ];
+        xdg.mime.defaultApplications."x-scheme-handler/tg" = "tg-web.desktop";
 
         services.greetd = {
           enable = true;

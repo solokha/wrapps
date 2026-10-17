@@ -26,6 +26,16 @@ nix run github:solokha/wrapps/main#env
 - Tools: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`
 - Agent: `opencode` (v2, from `llm-agents.nix`)
 
+## Telegram links
+
+`t.me` pages hand out a `tg://join?invite=…` link, and Firefox cannot open that
+scheme: a site may only claim `web+tg://`, and Telegram Web does not register it
+for itself. So the system holds the scheme: `nixosModules.desktop` installs the
+`tg-web` `.desktop` handler and points the XDG scheme database at it. The handler
+rewrites the link into the deep link
+`https://web.telegram.org/a/#?tgaddr=…` and opens it in the wrapped firefox —
+the same one that runs the Telegram web app window.
+
 ## Secrets
 
 `wrapps` is a public repository: credentials belong here **nowhere**. Everything

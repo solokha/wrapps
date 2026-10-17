@@ -101,6 +101,17 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     // pref, а не lockPref: переключается обратно из интерфейса.
     pref("browser.taskbarTabs.enabled", true);
 
+    // Схему tg:// Firefox сам обработать не может: сайту разрешено занять
+    // только web+tg://, а Telegram Web себе его не регистрирует. Отдаём схему
+    // системе — обработчик tg-web из этого же репозитория (modules/tg-web.nix).
+    // Три pref'а — тот же набор, что у mailto в самом firefox.js:
+    // external — схема обслуживается внешним приложением,
+    // expose=false — не пытаться обработать её внутри,
+    // warn-external=false — не спрашивать каждый раз «чем открыть».
+    pref("network.protocol-handler.external.tg", true);
+    pref("network.protocol-handler.expose.tg", false);
+    pref("network.protocol-handler.warn-external.tg", false);
+
     // vimium из списка force_installed: показывать подсказки, не разворачивать
     // панели настроек, и не мешать раскладке.
     pref("extensions.vimiumc.showAdvanced", false);

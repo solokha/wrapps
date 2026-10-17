@@ -26,6 +26,15 @@ nix run github:solokha/wrapps/main#env
 - Инструменты: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`
 - Агент: `opencode` (v2, из `llm-agents.nix`)
 
+## Ссылки Telegram
+
+Страницы `t.me` отдают ссылку `tg://join?invite=…`, и открыть её Firefox сам не
+может: сайту разрешено занять только `web+tg://`, а Telegram Web себе его не
+регистрирует. Поэтому схему держит система: `nixosModules.desktop` ставит
+`.desktop`-обработчик `tg-web` и прописывает его в XDG-базу схем. Обработчик
+переводит ссылку в диплинк `https://web.telegram.org/a/#?tgaddr=…` и открывает её
+в обёрнутом firefox — в том же окне-веб-приложении Telegram.
+
 ## Секреты
 
 `wrapps` — публичный репозиторий: учётных данных здесь **нет и быть не должно**.
