@@ -10,6 +10,27 @@ Portable NixOS environment and wrapped applications.
 nix run github:solokha/wrapps/main#env
 ```
 
+## Foreign host or live ISO
+
+A clean system has neither private keys nor `nix-command`/flakes enabled, so
+`nix run …#env` can fail before it starts, and the private repository cannot be
+cloned without keys. `setup.sh` covers both: it enables flakes for its own nix
+calls (without touching `/etc/nix/nix.conf`), restores the FIDO2 resident keys
+from the token, and enters the environment.
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/solokha/wrapps/main/setup.sh
+bash setup.sh
+```
+
+The same by hand:
+
+```bash
+export NIX_CONFIG='experimental-features = nix-command flakes'  # if flakes are off
+mkdir -p ~/.ssh && cd ~/.ssh && ssh-keygen -K                   # keys from the token, PIN and touch
+nix run github:solokha/wrapps/main#env
+```
+
 ## Contents
 
 - `env` — development environment with tools and wrapped packages

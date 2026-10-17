@@ -10,6 +10,27 @@
 nix run github:solokha/wrapps/main#env
 ```
 
+## Чужой хост или live-ISO
+
+На чистой системе нет ни приватных ключей, ни разрешённых `nix-command flakes`,
+поэтому `nix run …#env` может упасть ещё до старта, а без ключей не склонируется
+приватный репозиторий. `setup.sh` закрывает и то, и другое: включает flakes для
+своих вызовов (не трогая `/etc/nix/nix.conf`), достаёт резидентные ключи FIDO2 с
+токена и входит в окружение.
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/solokha/wrapps/main/setup.sh
+bash setup.sh
+```
+
+Вручную то же самое:
+
+```bash
+export NIX_CONFIG='experimental-features = nix-command flakes'  # если flakes выключены
+mkdir -p ~/.ssh && cd ~/.ssh && ssh-keygen -K                   # ключи с токена, PIN и касание
+nix run github:solokha/wrapps/main#env
+```
+
 ## Состав
 
 - `env` — окружение с инструментами и обёрнутыми пакетами
