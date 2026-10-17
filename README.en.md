@@ -26,6 +26,30 @@ nix run github:solokha/wrapps/main#env
 - Tools: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`
 - Agent: `opencode` (v2, from `llm-agents.nix`)
 
+## Secrets
+
+`wrapps` is a public repository: credentials belong here **nowhere**. Everything
+that lands in application defaults (agent, models, theme, fonts) is non-secret,
+and that is checked on every edit.
+
+Where secrets live once they appear:
+
+- **In the applications themselves**, under a persistent `$HOME`: for example
+  opencode credentials (`~/.local/share/opencode`) and the password of its local
+  service (`~/.config/opencode/service.json`). They do not sit next to the repo.
+- **Zed** keeps provider keys in the system secret store
+  (secret-service / gnome-keyring), not in `settings.json`. No store — no saved
+  key; that is a host configuration matter, not a wrapps one.
+- **Per-host values from the environment**: endpoints and tokens reach the process
+  as variables, and configs read them via `{env:...}` without hardcoding anything.
+  The non-secret part lives in the host config, the secret part in a local
+  git-ignored overlay.
+
+On a **foreign host or in a live image** there are simply no secrets: wrapps lays
+down non-secret defaults, and agents that need credentials ask to log in (opencode
+ACP offers "Login with opencode", Zed has its own sign-in). Nothing breaks and no
+secret travels anywhere.
+
 ## FIDO2
 
 FIDO2 keys are used for SSH access. The environment starts
