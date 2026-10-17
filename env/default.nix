@@ -208,6 +208,18 @@
   atuinConfig = pkgs.writeTextDir "config.toml" (builtins.readFile ./atuin.toml);
 
   envrc = pkgs.writeText "envrc" ''
+    # Переменные хоста из harness: HARNESS_DIR, PKM_VAULT и адреса локальных
+    # моделей для opencode.json ({env:LOCAL_MAIN_URL}/{env:LOCAL_FAST_URL}).
+    # Канонический файл ставит install.sh harness (симлинк на hosts/<host>.env);
+    # если его нет — молча пропускаем, среда остаётся рабочей без локальных
+    # моделей. Место подгрузки выбрано по harness/README.md: инициализация
+    # оболочки у нас — этот rcfile, а не ~/.bashrc.
+    if [ -r "$HOME/.config/harness.env" ]; then
+      set -a
+      . "$HOME/.config/harness.env"
+      set +a
+    fi
+
     # atuin в bash работает только через интерфейс bash-preexec: сам init лишь
     # дописывает __atuin_preexec/__atuin_precmd в preexec_functions и
     # precmd_functions, а вызывает их bash-preexec. Без него ATUIN_HISTORY_ID
