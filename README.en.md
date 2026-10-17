@@ -28,7 +28,7 @@ nix run github:solokha/wrapps/main#env
 
 ## FIDO2
 
-FIDO2 keys are used for SSH and commit signing. The environment starts
+FIDO2 keys are used for SSH access. The environment starts
 `wrapps-agent` and prompts when a PIN is needed.
 
 The first time, restore the keys from the token:
