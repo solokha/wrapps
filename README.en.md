@@ -75,6 +75,13 @@ mkdir -p ~/.ssh && cd ~/.ssh && ssh-keygen -K
 current directory, and requires a token touch. Afterwards `wrapps-ssh-config`
 adds them to `~/.ssh/config` unless the system already lists them.
 
+Key order is visible on every push, so `wrapps-agent` owns it: `ssh` offers
+the agent's keys to the server before the file ones and in the agent's own
+order, and `@clone` (the one always at hand) is loaded first — otherwise the
+first PIN and touch go to `@alone`, which is not. The ordered list is recorded
+in the pidfile next to the socket: when it changes, the agent is restarted
+instead of living on with a stale order.
+
 The private key files on disk are handle files only (empty) — the secret
 itself stays on the token.
 

@@ -111,6 +111,25 @@
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
 
+    # Порядок ключей в агенте — это и есть порядок, в котором ssh предлагает
+    # ключи серверу: ключи из агента идут раньше файловых и в порядке агента
+    # (sshconnect2.c, agent_keys), поэтому IdentityFile в ssh_config здесь
+    # ничего не решает. @clone — тот, что всегда с собой, поэтому первым: иначе
+    # ssh первым предлагает @alone и тратит PIN и касание на ключ, которого рядом
+    # нет. Тот же порядок задаёт wrapps-ssh-config для случая без агента.
+    keys=""
+    for want in clone other; do
+      for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
+        case "$k" in *.pub) continue ;; esac
+        [ -f "$k" ] || continue
+        case "$k" in
+          *@clone) [ "$want" = clone ] || continue ;;
+          *) [ "$want" = other ] || continue ;;
+        esac
+        keys="$keys $k"
+      done
+    done
+
     why=""
     usable() {
       local pid cmd want
@@ -127,6 +146,15 @@
       want="$(sed -n '2p' "$pidfile" 2>/dev/null || true)"
       if [ "$want" != "$dialog_kind" ]; then
         why="диалог не тот (в pidfile: ''${want:-пусто}, сейчас: $dialog_kind)"
+        return 1
+      fi
+      # Порядок ключей — тоже часть агента, а не украшение: агент, поднятый
+      # старым скриптом, останется с прежним порядком до перезапуска, и это
+      # молчаливая поломка (лишний PIN и касание на каждом push). Поэтому
+      # сохранённый список сравниваем так же, как вид диалога.
+      want="$(sed -n '3p' "$pidfile" 2>/dev/null || true)"
+      if [ "$want" != "$keys" ]; then
+        why="порядок ключей в агенте не тот (в pidfile: ''${want:-пусто})"
         return 1
       fi
       return 0
@@ -149,7 +177,7 @@
         echo "не удалось поднять агента: $out" >&2
         exit 1
       fi
-      printf '%s\n%s\n' "$pid" "$dialog_kind" >"$pidfile"
+      printf '%s\n%s\n%s\n' "$pid" "$dialog_kind" "$keys" >"$pidfile"
     fi
 
     export SSH_AUTH_SOCK="$sock"
@@ -159,9 +187,9 @@
       exit 1
     }
 
-    for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
-      case "$k" in *.pub) continue ;; esac
-      [ -f "$k" ] || continue
+    # $keys без кавычек намеренно: это список путей, разделённых пробелом, и
+    # пробелов внутри самих путей не бывает (имена ключей — из ssh-keygen -K).
+    for k in $keys; do
       ssh-add "$k" >/dev/null 2>&1 || true
     done
 
