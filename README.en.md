@@ -103,6 +103,27 @@ first PIN and touch go to `@alone`, which is not. The ordered list is recorded
 in the pidfile next to the socket: when it changes, the agent is restarted
 instead of living on with a stale order.
 
+### If a push answered "Permission denied (publickey)"
+
+That is not "no access": it is the answer of an agent holding no keys, i.e.
+`SSH_AUTH_SOCK` pointing past `wrapps-agent`. The host declares its own agent
+before us — NixOS `programs.ssh.startAgent` exports
+`SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent` into every process of the session
+(`set-environment`) — while `wrapps-agent` is the only thing that loads the
+FIDO2 keys, on entering the environment and only if the token's keys were
+already restored. A terminal opened **before** `ssh-keygen -K` keeps the empty
+agent: the keys appeared later, the env was already inherited.
+
+Check and fix it in that same shell:
+
+```bash
+ssh-add -l              # "The agent has no identities" → wrong agent
+eval "$(wrapps-agent)"  # sets SSH_AUTH_SOCK, askpass and the key order
+git push
+```
+
+A fresh terminal opened after the keys are back sets everything up by itself.
+
 The private key files on disk are handle files only (empty) — the secret
 itself stays on the token.
 

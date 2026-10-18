@@ -244,10 +244,26 @@
     _have_fido=0
     grep -lqiE 'HID_NAME=.*FIDO' /sys/class/hidraw/hidraw*/device/uevent 2>/dev/null && _have_fido=1
 
+    # Хост объявляет свой агент раньше нас: NixOS `programs.ssh.startAgent`
+    # кладёт `SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent` в `set-environment`, то
+    # есть во все процессы сессии, а ключи FIDO2 грузит только `wrapps-agent`.
+    # Две щели, в которые это выходит боком, говорим вслух: ключей с токена в
+    # ~/.ssh ещё нет (терминал, открытый до `ssh-keygen -K`, останется с чужим
+    # пустым агентом навсегда — env уже унаследован), и агент не поднялся, так
+    # что сокет остался чужим. Симптом у обоих один: push отвечает
+    # «Permission denied (publickey)», что читается как «доступа нет».
+    _sock="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wrapps-agent.sock"
     if [ "$_have_key" = 1 ] && [ "$_have_fido" = 1 ]; then
       eval "$(${agent}/bin/wrapps-agent)"
       ${sshconfig}/bin/wrapps-ssh-config >/dev/null 2>&1 || true
+      if [ "''${SSH_AUTH_SOCK:-}" != "$_sock" ]; then
+        printf 'env: SSH_AUTH_SOCK=%s, а ключи FIDO2 лежат в %s\n' "''${SSH_AUTH_SOCK:-пусто}" "$_sock" >&2
+        printf 'env: пустой агент ответит «Permission denied (publickey)» — поправить: eval "$(wrapps-agent)"\n' >&2
+      fi
+    elif [ "$_have_fido" = 1 ]; then
+      printf 'env: sk-ключей в ~/.ssh нет — они на токене: cd ~/.ssh && ssh-keygen -K\n' >&2
     fi
+    unset _sock
 
     _fzf_theme="''${XDG_CONFIG_HOME:-$HOME/.config}/fzf/themes/noctalia.sh"
     if [ -f "$_fzf_theme" ]; then
