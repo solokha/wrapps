@@ -10,7 +10,7 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     OfferToSaveLogins = false;
     PasswordManagerEnabled = false;
     SearchSuggestEnabled = true;
-    TranslateEnabled = false;
+    TranslateEnabled = true;
 
     ExtensionSettings = {
       "*" = {
@@ -50,6 +50,11 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
       "{d7742d87-e61d-4b78-b8a1-b469842139fa}" = {
         installation_mode = "force_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
+      };
+
+      "@testpilot-containers" = {
+        installation_mode = "force_installed";
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi";
       };
     };
 
@@ -93,6 +98,21 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     lockPref("privacy.globalprivacycontrol.enabled", true);
     lockPref("privacy.globalprivacycontrol.functionality.enabled", true);
     lockPref("intl.accept_languages", "ru, en-US, en");
+
+    // Встроенный перевод страниц: модели Bergamot считаются на машине, текст
+    // страниц наружу не уходит; пара языков докачивается с Mozilla при первом
+    // переводе. Автоперевода нет (`alwaysTranslateLanguages` не задан) —
+    // панель только предлагается, переводить или читать как есть решаешь сам.
+    // Русские страницы не предлагать. Обычный pref, а не lockPref: всё
+    // переключается обратно из интерфейса.
+    pref("browser.translations.enable", true);
+    pref("browser.translations.automaticallyPopup", true);
+    pref("browser.translations.neverTranslateLanguages", "ru");
+
+    // Multi-Account Containers (@testpilot-containers): контейнеры — встроенная
+    // фича, аддон лишь даёт интерфейс. Без этого pref'а аддон включает её сам,
+    // но лучше явно.
+    pref("privacy.userContext.enabled", true);
 
     // Закреплённые окна-«веб-приложения»: кнопка «Add tab to taskbar» в адресной
     // строке, каждой записи — свои домены в области видимости, на Linux
