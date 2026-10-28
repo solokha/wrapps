@@ -30,6 +30,8 @@ community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fz
 # бар остаётся дефолтным (сверху). `density` в 5.2 нет.
 # position: top | bottom | left | right. right = вертикальный справа.
 position = "right"
+# По умолчанию margin_ends = 100 — полосы сверху и снизу. 0 = бар на всю высоту.
+margin_ends = 0
 
 # Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
 # media, clipboard, brightness. Разбираем отдельно.
