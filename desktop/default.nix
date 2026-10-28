@@ -20,6 +20,14 @@ in
       log "не удалось положить конфиг noctalia — продолжаем без него"
     fi
 
+    # Обоина кладётся в стабильный путь в HOME: store-путь из пакета исчезает
+    # при сборке мусора, а config.toml ссылается на этот путь.
+    wallpaper_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/wallpapers"
+    mkdir -p "$wallpaper_dir"
+    if ! install -m 644 ${../wallpapers/ef_the_cat_returns.jpg} "$wallpaper_dir/ef_the_cat_returns.jpg"; then
+      log "не удалось положить обоину — останется прежняя"
+    fi
+
     # starship.toml кладём до старта niri: noctalia применяет свой builtin-шаблон
     # starship и создаёт файл раньше, после чего «если нет» в denv уже не
     # срабатывает и промпт остаётся дефолтным. Существующий не трогаем — то же

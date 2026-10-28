@@ -32,10 +32,16 @@ community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fz
 position = "right"
 
 [wallpaper]
-# Путь к обоям намеренно не задан: путь из пакета — это store-путь конкретной
-# сборки noctalia, он исчезает при сборке мусора.
+# Стабильный путь в HOME: desktop кладёт файл туда при старте. Store-путь из
+# пакета не годится — исчезает при сборке мусора.
 enabled = true
 fill_mode = "crop"
+directory = "~/.local/share/wallpapers"
+
+[wallpaper.default]
+# Стартовые обои; выбор в GUI/через IPC пишет то же в settings.toml и
+# перекрывает это значение.
+path = "~/.local/share/wallpapers/ef_the_cat_returns.jpg"
 
 [lockscreen_widgets]
 # enabled = false достаточно. Список widget_order и координаты cx/cy/placement_*
