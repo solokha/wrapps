@@ -31,6 +31,28 @@ community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fz
 # position: top | bottom | left | right. right = вертикальный справа.
 position = "right"
 
+# Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
+# media, clipboard, brightness. Разбираем отдельно.
+start = ["control-center", "workspaces"]
+center = ["clock"]
+end = [
+  "notifications",
+  "power-profile",
+  "volume",
+  "network",
+  "bluetooth",
+  "battery",
+  "privacy",
+  "tray",
+  "session",
+]
+
+[widget.clock]
+# Горизонтальный формат — на случай переезда бара наверх; на вертикальном
+# работает vertical_format.
+format = "{:%H:%M}"
+vertical_format = "{:%H\n%M}"
+
 [wallpaper]
 # Стабильный путь в HOME: desktop кладёт файл туда при старте. Store-путь из
 # пакета не годится — исчезает при сборке мусора.
