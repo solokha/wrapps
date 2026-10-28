@@ -25,9 +25,11 @@ builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "helix", "niri", "qt", "starship
 # пропустит их сама.
 community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fzf", "tmux" ]
 
-[bar]
+[bar.default]
+# Бар — именованная подтаблица: в noctalia 5.x `[bar]` с полями не читается,
+# бар остаётся дефолтным (сверху). `density` в 5.2 нет.
+# position: top | bottom | left | right. right = вертикальный справа.
 position = "right"
-density = "comfortable"
 
 [wallpaper]
 # Путь к обоям намеренно не задан: путь из пакета — это store-путь конкретной
