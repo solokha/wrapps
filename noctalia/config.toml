@@ -32,6 +32,13 @@ community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fz
 position = "right"
 # По умолчанию margin_ends = 100 — полосы сверху и снизу. 0 = бар на всю высоту.
 margin_ends = 0
+# Скругления только со стороны экрана (левые), у самого края — прямые углы.
+# concave_edge_corners по умолчанию вырезает углы в обратную сторону.
+concave_edge_corners = false
+radius_top_left = 12
+radius_bottom_left = 12
+radius_top_right = 0
+radius_bottom_right = 0
 
 # Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
 # media, clipboard, brightness. Разбираем отдельно.
