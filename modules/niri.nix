@@ -108,9 +108,9 @@
     }
 
     layout {
-      gaps 5
+      gaps 6
       focus-ring {
-        width 2
+        width 3
       }
     }
 

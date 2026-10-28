@@ -30,9 +30,9 @@ community_ids = [ "opencode", "zed", "fuzzel", "fastfetch", "zellij", "bat", "fz
 # бар остаётся дефолтным (сверху). `density` в 5.2 нет.
 # position: top | bottom | left | right. right = вертикальный справа.
 position = "right"
-# Небольшой отступ сверху и снизу, как у окон (niri gaps 5): бар и окна
+# Небольшой отступ сверху и снизу, как у окон (niri gaps 6): бар и окна
 # начинаются на одной линии, но не липнут к кромке экрана.
-margin_ends = 5
+margin_ends = 6
 # Скругления со всех сторон. concave_edge_corners по умолчанию вырезает углы
 # в обратную сторону, поэтому выключен.
 concave_edge_corners = false
