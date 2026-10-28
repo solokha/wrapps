@@ -82,3 +82,9 @@ path = "~/.local/share/wallpapers/ef_the_cat_returns.jpg"
 # enabled = false достаточно. Список widget_order и координаты cx/cy/placement_*
 # не переносим: это геометрия конкретных мониторов, и в wrapps ей не место.
 enabled = false
+
+[shell.panel]
+# Панели открываются у места клика (лого control-center, session), а не
+# центрируются вдоль бара.
+open_near_click_control_center = true
+open_near_click_session = true
