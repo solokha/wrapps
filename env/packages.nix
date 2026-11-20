@@ -24,7 +24,6 @@ with pkgs; [
   p7zip
 
   git
-  lazygit
   jq
   htop
   btop

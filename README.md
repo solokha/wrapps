@@ -41,10 +41,10 @@ nix run github:solokha/wrapps/main#env
 
 ## Пакеты
 
-- Терминал: `foot`, `zellij`; редактор: `micro`
+- Терминал: `foot`; редактор: `micro`
 - Десктоп: `niri`, `fuzzel`, `zed`
 - Браузер: `firefox`
-- Инструменты: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`
+- Инструменты: `git`, `btop`, `eza`, `ripgrep`, `fzf`
 - Агент: `opencode` (v2, из `llm-agents.nix`)
 
 ## Ссылки Telegram
