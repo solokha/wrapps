@@ -37,7 +37,6 @@
         shell = import ./env {inherit pkgs inputs self;};
       in {
         zellij = callModule "zellij";
-        helix = callModule "helix";
         nh = callModule "nh";
         opencode = callModule "opencode";
         foot = callModule "foot";

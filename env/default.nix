@@ -8,7 +8,6 @@
   tools = import ./packages.nix {inherit pkgs;};
 
   wrapped = [
-    self.packages.${system}.helix
     self.packages.${system}.nh
     self.packages.${system}.opencode
   ];
@@ -283,7 +282,7 @@
 
   denv = pkgs.writeShellScriptBin "denv" ''
     export SHELL="${pkgs.bash}/bin/bash"
-    export EDITOR="${self.packages.${system}.helix}/bin/hx"
+    export EDITOR="${pkgs.micro}/bin/micro"
     export PATH="${pkgs.lib.makeBinPath (tools ++ wrapped)}:$PATH"
 
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml" ./starship.toml}

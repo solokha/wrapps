@@ -18,7 +18,6 @@ in {
   inherit llm-agents;
   wrapps = {
     zellij = inputs.self.packages.${system}.zellij;
-    helix = inputs.self.packages.${system}.helix;
     nh = inputs.self.packages.${system}.nh;
     opencode = inputs.self.packages.${system}.opencode;
     foot = inputs.self.packages.${system}.foot;

@@ -9,7 +9,7 @@ shell_mode = "auto"
 
 [theme.templates]
 enable_builtin_templates = true
-builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "helix", "niri", "qt", "starship" ]
+builtin_ids = [ "btop", "foot", "gtk3", "gtk4", "niri", "qt", "starship" ]
 
 # community-шаблоны берутся из git-выкачки
 # ~/.local/state/noctalia/plugins/sources/community, которую noctalia обновляет

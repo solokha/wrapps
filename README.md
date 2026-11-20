@@ -41,7 +41,7 @@ nix run github:solokha/wrapps/main#env
 
 ## Пакеты
 
-- Терминал: `foot`, `zellij`, `helix`
+- Терминал: `foot`, `zellij`; редактор: `micro`
 - Десктоп: `niri`, `fuzzel`, `zed`
 - Браузер: `firefox`
 - Инструменты: `git`, `lazygit`, `btop`, `eza`, `ripgrep`, `fzf`

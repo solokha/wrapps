@@ -8,6 +8,8 @@ with pkgs; [
   manix
   nix-inspect
 
+  micro
+
   eza
   fd
   ripgrep
