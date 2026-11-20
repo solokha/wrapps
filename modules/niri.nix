@@ -124,10 +124,6 @@
     include optional=true "/etc/niri/cursor.kdl"
 
     include optional=true "~/.config/niri/noctalia.kdl"
-
-    xwayland-satellite {
-      path "${lib.getExe pkgs.xwayland-satellite}"
-    }
   '';
 in
   pkgs.symlinkJoin {
