@@ -1,2 +1,2 @@
 {pkgs, ...}:
-pkgs.unstable.noctalia
+pkgs.noctalia

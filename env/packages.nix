@@ -45,5 +45,5 @@ with pkgs; [
   age-plugin-fido2-hmac
   cryptsetup
 
-  pkgs.unstable.nvd
+  nvd
 ]
