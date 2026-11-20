@@ -28,7 +28,6 @@ with pkgs; [
   jq
   htop
   btop
-  pkgs.unstable.fastfetch
   wget
   killall
 

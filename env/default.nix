@@ -287,8 +287,6 @@
 
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml" ./starship.toml}
 
-    ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc" ./fastfetch/config.jsonc}
-
     ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf" ./btop.conf}
 
     ${deployConfig "\${HOME}/.tmux.conf" ./tmux.conf}
