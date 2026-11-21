@@ -60,7 +60,7 @@ widget_spacing = 15
 
 # Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
 # media, clipboard, brightness. Разбираем отдельно.
-start = ["control-center", "workspaces"]
+start = ["control-center", "workspaces", "keyboard_layout"]
 center = ["clock"]
 end = [
   "notifications",
@@ -79,6 +79,13 @@ end = [
 # работает vertical_format.
 format = "{:%H:%M}"
 vertical_format = "{:%H\n%M}"
+
+[widget.keyboard_layout]
+# Иконка клавиатуры + короткий код раскладки (RU/EN). Клик переключает
+# раскладку через niri, если compositor это умеет.
+show_glyph = true
+show_label = true
+display = "short"
 
 [wallpaper]
 # Стабильный путь в HOME: desktop кладёт файл туда при старте. Store-путь из
