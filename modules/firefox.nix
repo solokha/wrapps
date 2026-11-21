@@ -1,6 +1,17 @@
-{pkgs, ...}:
-pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
+{
+  pkgs,
+  sitePolicies ? [],
+  ...
+}:
+# Обычный release, а не ESR: SitePolicies.Container нужен с Firefox 158, в ESR 153
+# его нет. Вернуться на ESR, когда там появится 158 (следующий ESR, ~166).
+pkgs.wrapFirefox pkgs.firefox-unwrapped {
   extraPolicies = {
+    # Маршрутизация сайтов по контейнерам (SitePolicies.Container). Сами правила —
+    # хостовый факт, поэтому живут в infra и приходят через NixOS-опцию
+    # wrapps.firefox.sitePolicies. В публичном пакете список пустой.
+    SitePolicies = sitePolicies;
+
     DisableTelemetry = true;
     DisableFirefoxStudies = true;
     DisablePocket = true;
@@ -50,11 +61,6 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
       "{d7742d87-e61d-4b78-b8a1-b469842139fa}" = {
         installation_mode = "force_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
-      };
-
-      "@testpilot-containers" = {
-        installation_mode = "force_installed";
-        install_url = "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi";
       };
 
       "{0e5c8ff0-b54b-4bd1-b33e-d5e016e066f0}" = {
@@ -111,7 +117,7 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
 
     // Встроенный перевод страниц: модели Bergamot считаются на машине, текст
     // страниц наружу не уходит; пара языков докачивается с Mozilla при первом
-    // переводе. Автоперевода нет (`alwaysTranslateLanguages` не задан) —
+    // переводе. Автоперевода нет (alwaysTranslateLanguages не задан) —
     // панель только предлагается, переводить или читать как есть решаешь сам.
     // Русские страницы не предлагать. Обычный pref, а не lockPref: всё
     // переключается обратно из интерфейса.
@@ -119,9 +125,8 @@ pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
     pref("browser.translations.automaticallyPopup", true);
     pref("browser.translations.neverTranslateLanguages", "ru");
 
-    // Multi-Account Containers (@testpilot-containers): контейнеры — встроенная
-    // фича, аддон лишь даёт интерфейс. Без этого pref'а аддон включает её сам,
-    // но лучше явно.
+    // Контейнеры — встроенная фича Firefox. SitePolicies включает этот pref сам,
+    // но фиксируем явно: от него зависит маршрутизация по контейнерам.
     pref("privacy.userContext.enabled", true);
 
     // Закреплённые окна-«веб-приложения»: кнопка «Add tab to taskbar» в адресной

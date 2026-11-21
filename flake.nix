@@ -11,6 +11,11 @@
   } @ inputs: let
     systems = ["x86_64-linux" "aarch64-linux"];
     overlay = import ./overlay.nix {inherit inputs;};
+    mkFirefox = {
+      pkgs,
+      sitePolicies ? [],
+    }:
+      import ./modules/firefox.nix {inherit pkgs sitePolicies;};
     forAllSystems = f:
       nixpkgs.lib.genAttrs systems (system:
         f {
@@ -42,7 +47,7 @@
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
         niri = callModule "niri";
-        firefox = callModule "firefox";
+        firefox = mkFirefox {inherit pkgs;};
         tg-web = callModule "tg-web";
         noctalia = import ./noctalia {inherit pkgs;};
         desktop = import ./desktop {inherit pkgs inputs self;};
@@ -74,20 +79,35 @@
         pkgs,
         ...
       }: {
-        environment.systemPackages =
-          (with pkgs; [
-            gvfs
-            udisks
-            xdg-desktop-portal-gtk
-          ])
-          ++ [
-            self.packages.${pkgs.stdenv.hostPlatform.system}.env
-            self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
-            self.packages.${pkgs.stdenv.hostPlatform.system}.firefox
-            self.packages.${pkgs.stdenv.hostPlatform.system}.foot
-          ];
+        options.wrapps.firefox.sitePolicies = lib.mkOption {
+          type = lib.types.listOf lib.types.attrs;
+          default = [];
+          description = ''
+            Правила Firefox SitePolicies (Policies.Container). Порядок важен:
+            первое совпадение выигрывает. В публичном репозитории пусто; хостовые
+            домены задаются в infra.
+          '';
+        };
 
-        environment.sessionVariables.GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules";
+        config = {
+          environment.systemPackages =
+            (with pkgs; [
+              gvfs
+              udisks
+              xdg-desktop-portal-gtk
+            ])
+            ++ [
+              self.packages.${pkgs.stdenv.hostPlatform.system}.env
+              self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
+              (import ./modules/firefox.nix {
+                inherit pkgs;
+                inherit (config.wrapps.firefox) sitePolicies;
+              })
+              self.packages.${pkgs.stdenv.hostPlatform.system}.foot
+            ];
+
+          environment.sessionVariables.GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules";
+        };
       };
 
       desktop = {
