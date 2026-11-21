@@ -121,6 +121,7 @@
       clip-to-geometry true
     }
 
+    include optional=true "/etc/niri/user-dirs.kdl"
     include optional=true "/etc/niri/cursor.kdl"
 
     include optional=true "~/.config/niri/noctalia.kdl"
