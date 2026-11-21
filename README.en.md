@@ -127,6 +127,19 @@ A fresh terminal opened after the keys are back sets everything up by itself.
 The private key files on disk are handle files only (empty) — the secret
 itself stays on the token.
 
+## direnv
+
+`direnv` is part of `env`. If a project has `.envrc`, enter its directory and
+allow it once:
+
+```sh
+cd ~/work/lab/infra
+direnv allow
+```
+
+The devShell is then loaded automatically; `infra/.envrc` uses a local
+`../wrapps` when present instead of the `flake.lock` pin.
+
 ## Usage
 
 ```bash

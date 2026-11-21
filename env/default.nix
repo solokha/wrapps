@@ -264,6 +264,14 @@
     fi
     unset _sock
 
+    # direnv: .envrc в infra подхватывает devShell и локальный wrapps.
+    # Хук ставим здесь, а не в ~/.bashrc: инициализация оболочки у нас — этот
+    # rcfile. Разрешение каталога (direnv allow) — состояние пользователя,
+    # в infra оно живёт в cache.
+    if command -v direnv >/dev/null 2>&1; then
+      eval "$(direnv hook bash)"
+    fi
+
     _fzf_theme="''${XDG_CONFIG_HOME:-$HOME/.config}/fzf/themes/noctalia.sh"
     if [ -f "$_fzf_theme" ]; then
       . "$_fzf_theme"

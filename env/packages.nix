@@ -33,6 +33,8 @@ with pkgs; [
   atuin
   starship
 
+  direnv
+
   tmux
 
   sops
