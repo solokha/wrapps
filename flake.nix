@@ -100,6 +100,7 @@
             ++ [
               self.packages.${pkgs.stdenv.hostPlatform.system}.env
               self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
+              self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
               (import ./modules/firefox.nix {
                 inherit pkgs;
                 inherit (config.wrapps.firefox) sitePolicies;
