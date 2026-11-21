@@ -47,6 +47,10 @@ radius_bottom_left = 6
 radius_top_right = 6
 radius_bottom_right = 6
 
+# Расстояние между виджетами в секции. Дефолт 6 — иконки слипаются,
+# поэтому вдвое больше.
+widget_spacing = 12
+
 # Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
 # media, clipboard, brightness. Разбираем отдельно.
 start = ["control-center", "workspaces"]
