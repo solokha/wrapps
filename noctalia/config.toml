@@ -117,9 +117,3 @@ enabled = false
 open_near_click_control_center = true
 open_near_click_session = true
 
-[hooks]
-# Мост в Firefox: everforest-sync читает файл и переключает Everforest
-# Dark/Light. started нужен, чтобы после загрузки состояние появилось до
-# первого изменения темы.
-started = "mkdir -p \"$HOME/.local/state/noctalia\" && mode=$(noctalia msg theme-mode-get) && printf '%s' \"$mode\" > \"$HOME/.local/state/noctalia/theme-mode\" && noctalia-gtk-sync \"$mode\""
-theme_mode_changed = "printf '%s' \"$NOCTALIA_THEME_MODE\" > \"$HOME/.local/state/noctalia/theme-mode\" && noctalia-gtk-sync \"$NOCTALIA_THEME_MODE\""

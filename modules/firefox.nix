@@ -1,7 +1,6 @@
 {
   pkgs,
   sitePolicies ? [],
-  themeSync ? null,
   ...
 }:
 # Обычный release, а не ESR: SitePolicies.Container нужен с Firefox 158, в ESR 153
@@ -68,15 +67,7 @@ pkgs.wrapFirefox pkgs.firefox-unwrapped {
         installation_mode = "force_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/file/4055906/everforest_light_official-2.0.xpi";
       };
-    } // (if themeSync != null then {
-      # XPI ставится из store по file://, а не через пересборку
-      # firefox-unwrapped: иначе меняется деривация и тянется полный
-      # rebuild Firefox вместе с LLVM/Rust.
-      "everforest-sync@solokha" = {
-        installation_mode = "force_installed";
-        install_url = "file://${themeSync}";
-      };
-    } else {});
+    };
 
     FirefoxHome = {
       Search = true;

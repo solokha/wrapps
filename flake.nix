@@ -14,9 +14,8 @@
     mkFirefox = {
       pkgs,
       sitePolicies ? [],
-      themeSync ? null,
     }:
-      import ./modules/firefox.nix {inherit pkgs sitePolicies themeSync;};
+      import ./modules/firefox.nix {inherit pkgs sitePolicies;};
     forAllSystems = f:
       nixpkgs.lib.genAttrs systems (system:
         f {
@@ -41,30 +40,6 @@
           };
         env = import ./env {inherit pkgs inputs self;};
         shell = import ./env {inherit pkgs inputs self;};
-        themeSync = import ./modules/firefox-theme-sync.nix {inherit pkgs;};
-        gtkThemeSync = pkgs.writeShellScriptBin "noctalia-gtk-sync" ''
-          set -eu
-          mode="''${1:-dark}"
-          case "$mode" in
-            light) theme=adw-gtk3; prefer=0; scheme=prefer-light ;;
-            *)     theme=adw-gtk3-dark; prefer=1; scheme=prefer-dark ;;
-          esac
-
-          for d in gtk-3.0 gtk-4.0; do
-            dir="''${XDG_CONFIG_HOME:-$HOME/.config}/$d"
-            f="$dir/settings.ini"
-            mkdir -p "$dir"
-            touch "$f"
-            grep -q '^\[Settings\]' "$f" || printf '[Settings]\n' >> "$f"
-            sed -i '/^gtk-theme-name=/d; /^gtk-application-prefer-dark-theme=/d' "$f"
-            printf 'gtk-theme-name=%s\ngtk-application-prefer-dark-theme=%s\n' "$theme" "$prefer" >> "$f"
-          done
-
-          if command -v gsettings >/dev/null 2>&1; then
-            gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null || true
-            gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null || true
-          fi
-        '';
       in {
         nh = callModule "nh";
         opencode = callModule "opencode";
@@ -73,10 +48,7 @@
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
         niri = callModule "niri";
-        firefox = mkFirefox {inherit pkgs; themeSync = themeSync.xpi;};
-        firefox-theme-sync = themeSync.xpi;
-        firefox-theme-sync-host = themeSync.host;
-        noctalia-gtk-sync = gtkThemeSync;
+        firefox = mkFirefox {inherit pkgs;};
         tg-web = callModule "tg-web";
         noctalia = import ./noctalia {inherit pkgs;};
         desktop = import ./desktop {inherit pkgs inputs self;};
@@ -128,12 +100,9 @@
             ++ [
               self.packages.${pkgs.stdenv.hostPlatform.system}.env
               self.packages.${pkgs.stdenv.hostPlatform.system}.desktop
-              self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
-              self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-gtk-sync
               (import ./modules/firefox.nix {
                 inherit pkgs;
                 inherit (config.wrapps.firefox) sitePolicies;
-                themeSync = self.packages.${pkgs.stdenv.hostPlatform.system}.firefox-theme-sync;
               })
               self.packages.${pkgs.stdenv.hostPlatform.system}.foot
             ];
