@@ -43,6 +43,7 @@
       in {
         nh = callModule "nh";
         opencode = callModule "opencode";
+        opencode2-desktop = callModule "opencode2-desktop";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";

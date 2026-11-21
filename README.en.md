@@ -45,7 +45,7 @@ nix run github:solokha/wrapps/main#env
 - Desktop: `niri`, `fuzzel`, `zed`
 - Browser: `firefox`
 - Tools: `git`, `btop`, `eza`, `ripgrep`, `fzf`
-- Agent: `opencode` (v2, from `llm-agents.nix`)
+- Agent: `opencode` (v2, from `llm-agents.nix`); GUI client — `opencode2-desktop`
 
 ## Telegram links
 

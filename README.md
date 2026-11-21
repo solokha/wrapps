@@ -45,7 +45,7 @@ nix run github:solokha/wrapps/main#env
 - Десктоп: `niri`, `fuzzel`, `zed`
 - Браузер: `firefox`
 - Инструменты: `git`, `btop`, `eza`, `ripgrep`, `fzf`
-- Агент: `opencode` (v2, из `llm-agents.nix`)
+- Агент: `opencode` (v2, из `llm-agents.nix`), GUI-клиент — `opencode2-desktop`
 
 ## Ссылки Telegram
 
