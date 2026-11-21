@@ -107,7 +107,7 @@
               self.packages.${pkgs.stdenv.hostPlatform.system}.foot
             ];
 
-          environment.sessionVariables.GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules";
+          environment.sessionVariables.GIO_EXTRA_MODULES = lib.mkDefault "${pkgs.gvfs}/lib/gio/modules";
         };
       };
 
