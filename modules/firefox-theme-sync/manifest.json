@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Everforest Theme Sync",
+  "version": "1.0.0",
+  "description": "Switches Everforest Dark/Light themes when Noctalia changes mode.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "everforest-sync@solokha"
+    }
+  },
+  "permissions": ["management", "nativeMessaging"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  }
+}

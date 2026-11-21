@@ -8,6 +8,7 @@
   noctalia = "${self.packages.${system}.noctalia}/bin/noctalia";
   denv = "${self.packages.${system}.env}/bin/denv";
   shell = "${self.packages.${system}.env}/bin/shell";
+  themeSyncHost = "${self.packages.${system}.firefox-theme-sync-host}/bin/everforest-sync-host";
 in
   pkgs.writeShellScriptBin "desktop" ''
     set -euo pipefail
@@ -46,6 +47,20 @@ in
     fi
 
     rt="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+    # Мост Noctalia → Firefox: расширение everforest-sync общается с этим
+    # native-хостом и переключает Everforest Dark/Light по mode Noctalia.
+    native_dir="$HOME/.mozilla/native-messaging-hosts"
+    mkdir -p "$native_dir"
+    cat > "$native_dir/everforest-sync.json" <<EOF
+{
+  "name": "everforest_sync",
+  "description": "Everforest Dark/Light sync for Noctalia",
+  "path": "${themeSyncHost}",
+  "type": "stdio",
+  "allowed_extensions": ["everforest-sync@solokha"]
+}
+EOF
 
     ${niri} --session &
     niri_pid=$!

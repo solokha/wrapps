@@ -14,8 +14,9 @@
     mkFirefox = {
       pkgs,
       sitePolicies ? [],
+      themeSync ? null,
     }:
-      import ./modules/firefox.nix {inherit pkgs sitePolicies;};
+      import ./modules/firefox.nix {inherit pkgs sitePolicies themeSync;};
     forAllSystems = f:
       nixpkgs.lib.genAttrs systems (system:
         f {
@@ -40,6 +41,7 @@
           };
         env = import ./env {inherit pkgs inputs self;};
         shell = import ./env {inherit pkgs inputs self;};
+        themeSync = import ./modules/firefox-theme-sync.nix {inherit pkgs;};
       in {
         nh = callModule "nh";
         opencode = callModule "opencode";
@@ -48,7 +50,9 @@
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
         niri = callModule "niri";
-        firefox = mkFirefox {inherit pkgs;};
+        firefox = mkFirefox {inherit pkgs; themeSync = themeSync.xpi;};
+        firefox-theme-sync = themeSync.xpi;
+        firefox-theme-sync-host = themeSync.host;
         tg-web = callModule "tg-web";
         noctalia = import ./noctalia {inherit pkgs;};
         desktop = import ./desktop {inherit pkgs inputs self;};
@@ -104,6 +108,7 @@
               (import ./modules/firefox.nix {
                 inherit pkgs;
                 inherit (config.wrapps.firefox) sitePolicies;
+                themeSync = self.packages.${pkgs.stdenv.hostPlatform.system}.firefox-theme-sync;
               })
               self.packages.${pkgs.stdenv.hostPlatform.system}.foot
             ];
