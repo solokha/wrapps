@@ -124,6 +124,22 @@ git push
 
 A fresh terminal opened after the keys are back sets everything up by itself.
 
+### If the token was re-plugged and the push still says "agent refused operation"
+
+The agent sees the keys but cannot sign: it holds a token handle opened
+**before** the re-plug. `wrapps-agent` checks the pid, the dialog and the key
+order, but not the USB token state, so it does not restart itself. Restart it:
+
+```bash
+sock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wrapps-agent.sock"
+SSH_AUTH_SOCK="$sock" ssh-agent -k
+rm -f "$sock" "$sock.pid"
+eval "$(wrapps-agent)"
+git push
+```
+
+`askpass` is not the problem here — leave it alone; the stale agent is.
+
 The private key files on disk are handle files only (empty) — the secret
 itself stays on the token.
 
