@@ -4,24 +4,9 @@
   themeSync ? null,
   ...
 }:
-let
-  # Расширение кладём в distribution/extensions самого firefox-unwrapped:
-  # symlinkJoin-обёртка не даст писать внутрь store-пути.
-  firefox =
-    if themeSync == null
-    then pkgs.firefox-unwrapped
-    else
-      pkgs.firefox-unwrapped.overrideAttrs (old: {
-        postInstall =
-          (old.postInstall or "")
-          + ''
-            install -Dm644 ${themeSync} "$out/lib/firefox/distribution/extensions/everforest-sync@solokha.xpi"
-          '';
-      });
-in
 # Обычный release, а не ESR: SitePolicies.Container нужен с Firefox 158, в ESR 153
 # его нет. Вернуться на ESR, когда там появится 158 (следующий ESR, ~166).
-pkgs.wrapFirefox firefox {
+pkgs.wrapFirefox pkgs.firefox-unwrapped {
   extraPolicies = {
     # Маршрутизация сайтов по контейнерам (SitePolicies.Container). Сами правила —
     # хостовый факт, поэтому живут в infra и приходят через NixOS-опцию
@@ -84,11 +69,12 @@ pkgs.wrapFirefox firefox {
         install_url = "https://addons.mozilla.org/firefox/downloads/file/4055906/everforest_light_official-2.0.xpi";
       };
     } // (if themeSync != null then {
-      # Расширение лежит в distribution/extensions и только переключает
-      # Everforest Dark/Light по сигналу от Noctalia. Ставится не из AMO,
-      # поэтому политика должна явно разрешить его id.
+      # XPI ставится из store по file://, а не через пересборку
+      # firefox-unwrapped: иначе меняется деривация и тянется полный
+      # rebuild Firefox вместе с LLVM/Rust.
       "everforest-sync@solokha" = {
-        installation_mode = "allowed";
+        installation_mode = "force_installed";
+        install_url = "file://${themeSync}";
       };
     } else {});
 

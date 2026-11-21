@@ -65,7 +65,6 @@
 
     checks = forAllSystems ({
       system,
-      pkgs,
     }: {
       env = self.packages.${system}.env;
       desktop = self.packages.${system}.desktop;
@@ -118,8 +117,6 @@
       };
 
       desktop = {
-        config,
-        lib,
         pkgs,
         ...
       }: {
