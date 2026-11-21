@@ -127,6 +127,7 @@
         environment.systemPackages = [
           self.packages.${pkgs.stdenv.hostPlatform.system}.tg-web
           pkgs.pcmanfm
+          pkgs.engrampa
           pkgs.ungoogled-chromium
         ];
         xdg.mime.defaultApplications."x-scheme-handler/tg" = "tg-web.desktop";
