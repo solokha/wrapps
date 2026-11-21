@@ -98,7 +98,7 @@
       Mod+O { toggle-overview; }
       Mod+Shift+Slash { show-hotkey-overlay; }
       Mod+Shift+P { power-off-monitors; }
-      Print { screenshot; }
+      Mod+Shift+S { screenshot; }
 
       Mod+Return { spawn "${terminal}"; }
       Mod+D { spawn "${launcher}"; }
