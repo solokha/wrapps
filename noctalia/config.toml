@@ -37,9 +37,8 @@ position = "right"
 # не настолько, чтобы бар выбивался из 6-пиксельных отступов niri.
 thickness = 42
 
-# Крупнее иконки и текст в баре. Множитель также увеличивает внутренние
-# отступы, поэтому widget_spacing ниже остаётся логическим.
-scale = 1.2
+# Крупнее иконки и текст в баре. 1.1 — чуть больше дефолта без перебора.
+scale = 1.1
 # Небольшой отступ сверху и снизу, как у окон (niri gaps 6): бар и окна
 # начинаются на одной линии, но не липнут к кромке экрана.
 margin_ends = 6
@@ -60,7 +59,7 @@ widget_spacing = 15
 
 # Состав под вертикальный бар. Из дефолта не вошли: launcher, wallpaper,
 # media, clipboard, brightness. Разбираем отдельно.
-start = ["control-center", "workspaces", "keyboard_layout"]
+start = ["control-center", "workspaces"]
 center = ["clock"]
 end = [
   "notifications",
@@ -71,8 +70,16 @@ end = [
   "battery",
   "privacy",
   "tray",
+  "keyboard_layout",
+  "gap",
   "session",
 ]
+
+[widget.gap]
+# Раскладка прижата к системным значкам, а до кнопки питания — отдельный
+# фиксированный зазор.
+type = "spacer"
+length = 24
 
 [widget.clock]
 # Горизонтальный формат — на случай переезда бара наверх; на вертикальном
