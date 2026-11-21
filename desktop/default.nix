@@ -45,6 +45,14 @@ in
       exec ${shell} "$@"
     fi
 
+    # GTK3 читает settings.ini, а GTK4/портал/часть приложений — gsettings.
+    # Без этого icon-theme остаётся Adwaita, хотя в settings.ini Gruvbox.
+    if command -v gsettings >/dev/null 2>&1; then
+      gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3 2>/dev/null || true
+      gsettings set org.gnome.desktop.interface icon-theme Gruvbox-Plus-Dark 2>/dev/null || true
+      gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
+    fi
+
     rt="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 
     ${niri} --session &
