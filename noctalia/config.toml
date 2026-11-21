@@ -2,14 +2,12 @@
 # Палитра community, а не builtin. Источник правды — noctalia GUI, но на
 # машине без ~/.local/state/noctalia/settings.toml этот файл и есть всё, что
 # читает оболочка, поэтому он должен быть полным.
-# По умолчанию — auto: Noctalia сама выбирает light/dark по расписанию
-# [location]; пока координат нет, до первого расчёта будет светлая палитра.
-# Хостовый слой infra добавит [location] из sops.
-mode = "auto"
+# Пока нет [location] — тёмная тема. Хостовый слой infra добавит
+# координаты из sops и переключит mode на auto.
+mode = "dark"
 source = "community"
 community_palette = "Everforest Alt"
 shell_mode = "follow"
-sync_color_scheme = true
 
 [theme.templates]
 enable_builtin_templates = true
