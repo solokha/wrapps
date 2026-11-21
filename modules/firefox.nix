@@ -58,15 +58,6 @@ pkgs.wrapFirefox pkgs.firefox-unwrapped {
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
       };
 
-      # Pywalfox: динамическая тема из палитры Noctalia. Noctalia выступает
-      # native-messaging хостом (noctalia firefox-theme), расширение получает
-      # colors.json и перекрашивает chrome. Без него остаётся статическая
-      # Everforest-тема ниже.
-      "pywalfox@frewacom.org" = {
-        installation_mode = "force_installed";
-        install_url = "https://addons.mozilla.org/firefox/downloads/latest/pywalfox/latest.xpi";
-      };
-
       "{0e5c8ff0-b54b-4bd1-b33e-d5e016e066f0}" = {
         installation_mode = "force_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/file/5128466/everforest_dark_medium_theme-2.9.xpi";
@@ -159,9 +150,5 @@ pkgs.wrapFirefox pkgs.firefox-unwrapped {
     // Everforest Dark Medium по умолчанию; светлая тема — см. GUID
     // {08400cc9-1bf6-4e3e-b175-2d2650bc3104} (Everforest Light).
     pref("extensions.activeThemeID", "{0e5c8ff0-b54b-4bd1-b33e-d5e016e066f0}");
-
-    // Pywalfox/Noctalia пишут userChrome.css в профиль; без этого pref'а
-    // Firefox его не читает. Статическая тема выше остаётся запасной.
-    pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
   '';
 }
