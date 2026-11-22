@@ -48,7 +48,7 @@ inputs.nix-wrapper-modules.wrappers.noctalia.wrap {
 
       widget_spacing = 15;
 
-      start = ["control-center" "workspaces"];
+      start = ["control-center" "gap-start" "workspaces"];
       center = ["clock"];
       end = [
         "notifications"
@@ -66,6 +66,11 @@ inputs.nix-wrapper-modules.wrappers.noctalia.wrap {
     };
 
     widget = {
+      gap-start = {
+        type = "spacer";
+        length = 24;
+      };
+
       gap = {
         type = "spacer";
         length = 24;
