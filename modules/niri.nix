@@ -145,7 +145,7 @@ in
           default-floating-position = _: {
             props = {
               x = 0;
-              y = 0;
+              y = 6;
               relative-to = "top";
             };
           };
