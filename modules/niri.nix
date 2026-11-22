@@ -56,10 +56,10 @@ in
         "Mod+Ctrl+Right".move-column-right = _: {};
         "Mod+Ctrl+Up".move-window-up = _: {};
         "Mod+Ctrl+Down".move-window-down = _: {};
-        "Mod+Home".focus-column-first = _: {};
-        "Mod+End".focus-column-last = _: {};
-        "Mod+Ctrl+Home".move-column-to-first = _: {};
-        "Mod+Ctrl+End".move-column-to-last = _: {};
+        "Mod+Comma".focus-column-first = _: {};
+        "Mod+Period".focus-column-last = _: {};
+        "Mod+Ctrl+Comma".move-column-to-first = _: {};
+        "Mod+Ctrl+Period".move-column-to-last = _: {};
 
         "Mod+Page_Up".focus-workspace-up = _: {};
         "Mod+Page_Down".focus-workspace-down = _: {};
@@ -77,6 +77,8 @@ in
         "Mod+Shift+1".move-column-to-workspace = "w0";
         "Mod+Shift+2".move-column-to-workspace = "w1";
         "Mod+Shift+3".move-column-to-workspace = "w2";
+        "Mod+Shift+4".move-column-to-workspace = "w3";
+        "Mod+Shift+5".move-column-to-workspace = "w4";
 
         "Mod+WheelScrollUp".focus-workspace-up = _: {};
         "Mod+WheelScrollDown".focus-workspace-down = _: {};
