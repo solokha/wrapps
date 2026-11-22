@@ -47,7 +47,7 @@
         niri = callModule "niri";
         firefox = mkFirefox {inherit pkgs;};
         tg-web = callModule "tg-web";
-        noctalia = import ./noctalia {inherit pkgs;};
+        noctalia = import ./noctalia {inherit pkgs inputs;};
         desktop = import ./desktop {inherit pkgs inputs self;};
         nixos-anywhere = callModule "nixos-anywhere";
         env = env;

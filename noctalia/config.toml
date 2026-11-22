@@ -2,8 +2,8 @@
 # Палитра community, а не builtin. Источник правды — noctalia GUI, но на
 # машине без ~/.local/state/noctalia/settings.toml этот файл и есть всё, что
 # читает оболочка, поэтому он должен быть полным.
-# Пока нет [location] — тёмная тема. Хостовый слой infra добавит
-# координаты из sops и переключит mode на auto.
+# Пока нет [location] — тёмная тема. Координаты из sops появятся, когда
+# infra научится собирать конфиг во время запуска; тогда mode станет auto.
 mode = "dark"
 source = "community"
 community_palette = "Everforest Alt"

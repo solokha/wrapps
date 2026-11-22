@@ -14,12 +14,6 @@ in
 
     log() { printf 'desktop: %s\n' "$*"; }
 
-    noctalia_config_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/noctalia"
-    mkdir -p "$noctalia_config_dir"
-    if ! install -m 644 ${../noctalia/config.toml} "$noctalia_config_dir/config.toml"; then
-      log "не удалось положить конфиг noctalia — продолжаем без него"
-    fi
-
     # Обоина кладётся в стабильный путь в HOME: store-путь из пакета исчезает
     # при сборке мусора, а config.toml ссылается на этот путь.
     wallpaper_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/wallpapers"
