@@ -37,20 +37,25 @@
       id = "jinjaccalgkegednnccohejagnlnfdag";
       hash = "sha256-Q0QYHk7D80lXY+Xa3NV/1zOmwJlYmtws32nSzaDn1lM=";
     })
-    (fetchCrx {
-      id = "ddkjiahejlhfcafbddmgiahcphecmpfh";
-      hash = "sha256-CQj0ttGaOPJoG9dG5Fl9eBjwg7s+LjzFU0tAfYlrB/0=";
-    })
   ];
 
+  uboLite = fetchCrx {
+    id = "ddkjiahejlhfcafbddmgiahcphecmpfh";
+    hash = "sha256-CQj0ttGaOPJoG9dG5Fl9eBjwg7s+LjzFU0tAfYlrB/0=";
+  };
+
   loadPaths = lib.concatMapStringsSep "," toString extensions;
+  uboName = builtins.baseNameOf (toString uboLite);
 in
-  pkgs.symlinkJoin {
-    name = "ungoogled-chromium-extensions";
-    paths = [pkgs.ungoogled-chromium];
-    nativeBuildInputs = [pkgs.makeWrapper];
-    meta.mainProgram = "chromium";
-    postBuild = ''
-      wrapProgram $out/bin/chromium --add-flags "--load-extension=${loadPaths}"
-    '';
-  }
+  pkgs.writeShellScriptBin "chromium" ''
+    set -eu
+
+    cache="''${XDG_CACHE_HOME:-$HOME/.cache}/chromium-extensions/${uboName}"
+    if [ ! -d "$cache" ]; then
+      mkdir -p "$(dirname "$cache")"
+      cp -r ${uboLite} "$cache"
+      chmod -R u+w "$cache"
+    fi
+
+    exec ${lib.getExe pkgs.ungoogled-chromium} --load-extension=${loadPaths},$cache "$@"
+  ''
