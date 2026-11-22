@@ -110,10 +110,9 @@ adds them to `~/.ssh/config` unless the system already lists them.
 
 Key order is visible on every push, so `wrapps-agent` owns it: `ssh` offers
 the agent's keys to the server before the file ones and in the agent's own
-order, and `@clone` (the one always at hand) is loaded first — otherwise the
-first PIN and touch go to `@alone`, which is not. The ordered list is recorded
-in the pidfile next to the socket: when it changes, the agent is restarted
-instead of living on with a stale order.
+order, and `@alone` (the primary token) is loaded first, `@clone` second. The
+ordered list is recorded in the pidfile next to the socket: when it changes,
+the agent is restarted instead of living on with a stale order.
 
 ### If a push answered "Permission denied (publickey)"
 

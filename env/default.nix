@@ -52,12 +52,12 @@
     fi
 
     keys=""
-    for want in clone other; do
+    for want in alone other; do
       for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
         case "$k" in *.pub) continue ;; esac
         [ -f "$k" ] || continue
         case "$k" in
-          *@clone) [ "$want" = clone ] || continue ;;
+          *@alone) [ "$want" = alone ] || continue ;;
           *) [ "$want" = other ] || continue ;;
         esac
         keys="$keys\n  IdentityFile $k"
@@ -104,12 +104,12 @@
     pidfile="$sock.pid"
 
     keys=""
-    for want in clone other; do
+    for want in alone other; do
       for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
         case "$k" in *.pub) continue ;; esac
         [ -f "$k" ] || continue
         case "$k" in
-          *@clone) [ "$want" = clone ] || continue ;;
+          *@alone) [ "$want" = alone ] || continue ;;
           *) [ "$want" = other ] || continue ;;
         esac
         keys="$keys $k"
