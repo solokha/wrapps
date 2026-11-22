@@ -46,8 +46,8 @@
 
   loadPaths = lib.concatMapStringsSep "," toString extensions;
   uboName = builtins.baseNameOf (toString uboLite);
-in
-  pkgs.writeShellScriptBin "chromium" ''
+
+  script = pkgs.writeShellScriptBin "chromium" ''
     set -eu
 
     cache="''${XDG_CACHE_HOME:-$HOME/.cache}/chromium-extensions/${uboName}"
@@ -58,4 +58,14 @@ in
     fi
 
     exec ${lib.getExe pkgs.ungoogled-chromium} --load-extension=${loadPaths},$cache "$@"
-  ''
+  '';
+in
+  pkgs.symlinkJoin {
+    name = "chromium";
+    paths = [pkgs.ungoogled-chromium];
+    meta.mainProgram = "chromium";
+    postBuild = ''
+      rm -f $out/bin/chromium
+      ln -s ${script}/bin/chromium $out/bin/chromium
+    '';
+  }
