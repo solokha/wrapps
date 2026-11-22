@@ -6,10 +6,6 @@
   # только при совпадении ревизий nixpkgs — ради этого и follows на входе.
   llm-agents = (inputs.llm-agents.overlays.shared-nixpkgs final prev).llm-agents;
 in {
-  unstable = import inputs.nixpkgs-unstable {
-    inherit system;
-    config.allowUnfree = true;
-  };
   master = import inputs.nixpkgs-master {
     inherit system;
     config.allowUnfree = true;

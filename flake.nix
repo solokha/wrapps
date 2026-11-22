@@ -4,7 +4,6 @@
   outputs = {
     self,
     nixpkgs,
-    nixpkgs-unstable,
     nixpkgs-master,
     nix-wrapper-modules,
     ...
@@ -148,7 +147,6 @@
     # Временно nixos-unstable: нужен oo7 0.7.x и свежие пакеты. При выходе
     # 26.11 меняется только эта строка — остальной флейк не трогаем.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
