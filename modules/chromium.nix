@@ -1,25 +1,52 @@
 {
   pkgs,
+  lib,
   ...
 }: let
-  darkreader = pkgs.fetchurl {
-    url = "https://github.com/darkreader/darkreader/releases/download/v4.9.135/darkreader-chrome-mv3.zip";
-    hash = "sha256-bFm6EflzP28bpC55ET4r92TEH51QEDtSevc29V+8z0c=";
-  };
+  fetchCrx = {
+    id,
+    hash,
+  }: let
+    crx = pkgs.fetchurl {
+      url = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=158.0.0.0&acceptformat=crx2,crx3&x=id%3D${id}%26uc";
+      inherit hash;
+    };
+  in
+    pkgs.runCommand "chromium-ext-${id}" {
+      nativeBuildInputs = [pkgs.unzip];
+    } ''
+      ${pkgs.python3}/bin/python3 -c 'import struct,sys; d=open(sys.argv[1],"rb").read(); h=struct.unpack("<I",d[8:12])[0]; open(sys.argv[2],"wb").write(d[12+h:])' ${crx} ext.zip
+      mkdir -p $out
+      unzip -q ext.zip -d $out
+    '';
 
-  extension = pkgs.runCommand "darkreader-chromium" {
-    nativeBuildInputs = [pkgs.unzip];
-  } ''
-    mkdir -p $out
-    unzip -q ${darkreader} -d $out
-  '';
+  extensions = [
+    (fetchCrx {
+      id = "nngceckbapebfimnlniiiahkandclblb";
+      hash = "sha256-W7/EQcarOCqGd7EzrqP8P/K67XzP5usbFhcbQpiTc/I=";
+    })
+    (fetchCrx {
+      id = "ldgfbffkinooeloadekpmfoklnobpien";
+      hash = "sha256-zHxhKB0Jq88rJWRxHruACBdq8fhDgtltMi2uoZ6MCiY=";
+    })
+    (fetchCrx {
+      id = "dbepggeogbaibhgnhhndojpepiihcmeb";
+      hash = "sha256-MZjCaqcZvkYt6lhQUPvtm4uAYo1X6oihE7q/UzTFUXw=";
+    })
+    (fetchCrx {
+      id = "jinjaccalgkegednnccohejagnlnfdag";
+      hash = "sha256-Q0QYHk7D80lXY+Xa3NV/1zOmwJlYmtws32nSzaDn1lM=";
+    })
+  ];
+
+  loadPaths = lib.concatMapStringsSep "," toString extensions;
 in
   pkgs.symlinkJoin {
-    name = "ungoogled-chromium-darkreader";
+    name = "ungoogled-chromium-extensions";
     paths = [pkgs.ungoogled-chromium];
     nativeBuildInputs = [pkgs.makeWrapper];
     meta.mainProgram = "chromium";
     postBuild = ''
-      wrapProgram $out/bin/chromium --add-flags "--load-extension=${extension}"
+      wrapProgram $out/bin/chromium --add-flags "--load-extension=${loadPaths}"
     '';
   }
