@@ -1,6 +1,0 @@
-update_check = false
-
-auto_sync = false
-
-[stats]
-ignored_commands = ["cd", "ls"]

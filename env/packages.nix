@@ -26,16 +26,10 @@ with pkgs; [
   git
   jq
   htop
-  btop
   wget
   killall
 
-  atuin
-  starship
-
   direnv
-
-  tmux
 
   sops
   age

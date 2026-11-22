@@ -39,11 +39,12 @@ nix run github:solokha/wrapps/main#env
 - `desktop` — full desktop environment
 - `noctalia` — Noctalia shell with its settings
 
-## Empty config stubs
+## Environment configs
 
-`env/btop.conf` and `env/tmux.conf` are intentionally empty: Noctalia templates
-do not create these files, they edit existing ones. Do not delete them, or the
-Noctalia theme will not be applied.
+`atuin`, `btop`, `starship` and `tmux` are built with wrapper modules: settings
+are Nix attributes in `modules/`, generated files live in the store. `starship.toml`
+is also copied to `~/.config` before Noctalia starts, because its template appends
+the palette there.
 
 ## Packages
 

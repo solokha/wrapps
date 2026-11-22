@@ -9,6 +9,10 @@
 
   wrapped = [
     self.packages.${system}.opencode
+    self.packages.${system}.atuin
+    self.packages.${system}.btop
+    self.packages.${system}.starship
+    self.packages.${system}.tmux
   ];
 
   askpass = pkgs.writeShellScriptBin "wrapps-askpass" ''
@@ -175,8 +179,6 @@
     echo "export SSH_AUTH_SOCK=$sock"
   '';
 
-  atuinConfig = pkgs.writeTextDir "config.toml" (builtins.readFile ./atuin.toml);
-
   envrc = pkgs.writeText "envrc" ''
     if [ -r "$HOME/.config/harness.env" ]; then
       set -a
@@ -186,11 +188,9 @@
 
     source ${pkgs.bash-preexec}/share/bash/bash-preexec.sh
 
-    eval "$(${pkgs.starship}/bin/starship init bash)"
+    eval "$(${self.packages.${system}.starship}/bin/starship init bash)"
 
-    export ATUIN_CONFIG_DIR=${atuinConfig}
-
-    eval "$(${pkgs.atuin}/bin/atuin init bash --disable-up-arrow)"
+    eval "$(${self.packages.${system}.atuin}/bin/atuin init bash --disable-up-arrow)"
 
     _have_key=0
     for _k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
@@ -224,25 +224,10 @@
     unset _fzf_theme
   '';
 
-  deployConfig = target: content: ''
-    if [ ! -f "${target}" ]; then
-      mkdir -p "$(dirname "${target}")"
-      if ! install -m 644 ${content} "${target}"; then
-        printf 'env: не удалось положить %s\n' "${target}" >&2
-      fi
-    fi
-  '';
-
   denv = pkgs.writeShellScriptBin "denv" ''
     export SHELL="${pkgs.bash}/bin/bash"
     export EDITOR="${pkgs.micro}/bin/micro"
-    export PATH="${pkgs.lib.makeBinPath (tools ++ wrapped)}:$PATH"
-
-    ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml" ./starship.toml}
-
-    ${deployConfig "\${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf" ./btop.conf}
-
-    ${deployConfig "\${HOME}/.tmux.conf" ./tmux.conf}
+    export PATH="${pkgs.lib.makeBinPath (wrapped ++ tools)}:$PATH"
 
     exec ${pkgs.bash}/bin/bash --rcfile ${envrc} "$@"
   '';

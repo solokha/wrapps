@@ -41,6 +41,10 @@
         shell = import ./env {inherit pkgs inputs self;};
       in {
         opencode = callModule "opencode";
+        atuin = callModule "atuin";
+        btop = callModule "btop";
+        starship = callModule "starship";
+        tmux = callModule "tmux";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";

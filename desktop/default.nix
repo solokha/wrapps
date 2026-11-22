@@ -23,7 +23,7 @@ in
     starship_config="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
     if [ ! -f "$starship_config" ]; then
       mkdir -p "$(dirname "$starship_config")"
-      if ! install -m 644 ${../env/starship.toml} "$starship_config"; then
+      if ! install -m 644 ${self.packages.${system}.starship}/starship.toml "$starship_config"; then
         log "не удалось положить конфиг starship — останется дефолтный промпт"
       fi
     fi

@@ -10,6 +10,10 @@ in {
   inherit llm-agents;
   wrapps = {
     opencode = inputs.self.packages.${system}.opencode;
+    atuin = inputs.self.packages.${system}.atuin;
+    btop = inputs.self.packages.${system}.btop;
+    starship = inputs.self.packages.${system}.starship;
+    tmux = inputs.self.packages.${system}.tmux;
     foot = inputs.self.packages.${system}.foot;
     fuzzel = inputs.self.packages.${system}.fuzzel;
     zed = inputs.self.packages.${system}.zed;
