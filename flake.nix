@@ -150,6 +150,7 @@
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
+      # Иначе библиотека тянет собственный nixpkgs и второй бинарный кэш.
       inputs.nixpkgs.follows = "nixpkgs";
     };
     llm-agents = {
