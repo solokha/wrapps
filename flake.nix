@@ -126,6 +126,20 @@
           pkgs.pcmanfm
           pkgs.engrampa
           self.packages.${pkgs.stdenv.hostPlatform.system}.chromium
+          (pkgs.makeDesktopItem {
+            name = "telegram-web";
+            desktopName = "Telegram Web";
+            exec = "${self.packages.${pkgs.stdenv.hostPlatform.system}.chromium}/bin/chromium --app=https://web.telegram.org/a/";
+            categories = ["Network" "Chat"];
+            terminal = false;
+          })
+          (pkgs.makeDesktopItem {
+            name = "max-web";
+            desktopName = "MAX Web";
+            exec = "${self.packages.${pkgs.stdenv.hostPlatform.system}.chromium}/bin/chromium --app=https://web.max.ru/";
+            categories = ["Network" "Chat"];
+            terminal = false;
+          })
         ];
         xdg.mime.defaultApplications."x-scheme-handler/tg" = "tg-web.desktop";
         xdg.mime.defaultApplications."inode/directory" = "pcmanfm.desktop";
