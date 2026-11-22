@@ -37,6 +37,10 @@
       id = "jinjaccalgkegednnccohejagnlnfdag";
       hash = "sha256-Q0QYHk7D80lXY+Xa3NV/1zOmwJlYmtws32nSzaDn1lM=";
     })
+    (fetchCrx {
+      id = "ddkjiahejlhfcafbddmgiahcphecmpfh";
+      hash = "sha256-CQj0ttGaOPJoG9dG5Fl9eBjwg7s+LjzFU0tAfYlrB/0=";
+    })
   ];
 
   loadPaths = lib.concatMapStringsSep "," toString extensions;

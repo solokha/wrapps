@@ -36,6 +36,14 @@ in
       fi
     fi
 
+    chromium_prefs="''${XDG_CONFIG_HOME:-$HOME/.config}/chromium/Default/Preferences"
+    if [ ! -f "$chromium_prefs" ]; then
+      mkdir -p "$(dirname "$chromium_prefs")"
+      if ! printf '%s\n' '{"extensions":{"theme":{"system_theme":1}},"vertical_tabs":{"enabled":true}}' >"$chromium_prefs"; then
+        log "не удалось задать стартовые настройки Chromium"
+      fi
+    fi
+
     if [ -n "''${WAYLAND_DISPLAY:-}" ] || [ -n "''${DISPLAY:-}" ]; then
       log "запущено внутри ''${WAYLAND_DISPLAY:-$DISPLAY} — desktop требует чистый tty (greetd/логин)"
       exec ${shell} "$@"
