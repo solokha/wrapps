@@ -13,9 +13,7 @@ in {
   # Пакеты llm-agents под своим именем: pkgs.llm-agents.opencode2 и т. д.
   inherit llm-agents;
   wrapps = {
-    nh = inputs.self.packages.${system}.nh;
     opencode = inputs.self.packages.${system}.opencode;
-    opencode2-desktop = inputs.self.packages.${system}.opencode2-desktop;
     foot = inputs.self.packages.${system}.foot;
     fuzzel = inputs.self.packages.${system}.fuzzel;
     zed = inputs.self.packages.${system}.zed;

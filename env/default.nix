@@ -8,7 +8,6 @@
   tools = import ./packages.nix {inherit pkgs;};
 
   wrapped = [
-    self.packages.${system}.nh
     self.packages.${system}.opencode
   ];
 

@@ -40,9 +40,7 @@
         env = import ./env {inherit pkgs inputs self;};
         shell = import ./env {inherit pkgs inputs self;};
       in {
-        nh = callModule "nh";
         opencode = callModule "opencode";
-        opencode2-desktop = callModule "opencode2-desktop";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
