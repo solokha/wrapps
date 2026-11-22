@@ -79,7 +79,7 @@ pkgs.wrapFirefox pkgs.firefox-unwrapped {
 
     SearchEngines = {
       Default = "DuckDuckGo";
-      Remove = ["Amazon.com" "Bing" "eBay" "Google" "Wikipedia (en)"];
+      Remove = ["Amazon.com" "Bing" "eBay" "Google" "Wikipedia (en)" "Perplexity"];
     };
 
     Homepage = {
