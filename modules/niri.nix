@@ -10,7 +10,7 @@
   noctalia = "${self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia}/bin/noctalia";
   niri = "${pkgs.niri}/bin/niri";
 
-  quake = pkgs.writeShellScript "quake" ''
+  quake = pkgs.writeShellScriptBin "quake" ''
     set -eu
     win="$(${niri} msg --json windows | ${pkgs.jq}/bin/jq -r '[.[] | select(.app_id == "dropdown")][0].id // empty')"
     if [ -n "$win" ]; then
