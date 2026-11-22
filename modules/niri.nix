@@ -149,7 +149,7 @@ in
               relative-to = "top";
             };
           };
-          default-window-height = {proportion = 0.5;};
+          default-window-height = {proportion = 0.7;};
           default-column-width = {proportion = 0.8;};
         }
       ];
