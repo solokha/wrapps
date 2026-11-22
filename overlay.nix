@@ -14,6 +14,8 @@ in {
     btop = inputs.self.packages.${system}.btop;
     starship = inputs.self.packages.${system}.starship;
     tmux = inputs.self.packages.${system}.tmux;
+    bat = inputs.self.packages.${system}.bat;
+    eza = inputs.self.packages.${system}.eza;
     foot = inputs.self.packages.${system}.foot;
     fuzzel = inputs.self.packages.${system}.fuzzel;
     zed = inputs.self.packages.${system}.zed;

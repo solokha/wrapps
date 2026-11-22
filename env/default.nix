@@ -13,6 +13,8 @@
     self.packages.${system}.btop
     self.packages.${system}.starship
     self.packages.${system}.tmux
+    self.packages.${system}.bat
+    self.packages.${system}.eza
   ];
 
   askpass = pkgs.writeShellScriptBin "wrapps-askpass" ''
@@ -187,6 +189,12 @@
     fi
 
     source ${pkgs.bash-preexec}/share/bash/bash-preexec.sh
+
+    alias ls='eza --icons=auto --group-directories-first'
+    alias ll='eza -l --icons=auto --group-directories-first --git'
+    alias la='eza -la --icons=auto --group-directories-first --git'
+    alias lt='eza --tree --level=2 --icons=auto'
+    alias cat='bat --paging=never'
 
     eval "$(${self.packages.${system}.starship}/bin/starship init bash)"
 

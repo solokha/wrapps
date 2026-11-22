@@ -10,7 +10,6 @@ with pkgs; [
 
   micro
 
-  eza
   fd
   ripgrep
   zoxide

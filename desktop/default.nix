@@ -28,6 +28,14 @@ in
       fi
     fi
 
+    bat_config="''${XDG_CONFIG_HOME:-$HOME/.config}/bat/config"
+    if [ ! -f "$bat_config" ]; then
+      mkdir -p "$(dirname "$bat_config")"
+      if ! install -m 644 ${self.packages.${system}.bat}/bat-config/config "$bat_config"; then
+        log "не удалось положить конфиг bat — останутся дефолтные флаги"
+      fi
+    fi
+
     if [ -n "''${WAYLAND_DISPLAY:-}" ] || [ -n "''${DISPLAY:-}" ]; then
       log "запущено внутри ''${WAYLAND_DISPLAY:-$DISPLAY} — desktop требует чистый tty (greetd/логин)"
       exec ${shell} "$@"

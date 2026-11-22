@@ -46,6 +46,11 @@ are Nix attributes in `modules/`, generated files live in the store. `starship.t
 is also copied to `~/.config` before Noctalia starts, because its template appends
 the palette there.
 
+## Aliases
+
+In the interactive shell: `ls`, `ll`, `la`, `lt` use eza, `cat` uses bat.
+`grep` and `find` are intentionally not replaced: rg and fd take different flags.
+
 ## Packages
 
 - Terminal: `foot`; editor: `micro`

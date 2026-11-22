@@ -45,6 +45,8 @@
         btop = callModule "btop";
         starship = callModule "starship";
         tmux = callModule "tmux";
+        bat = callModule "bat";
+        eza = callModule "eza";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
