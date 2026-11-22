@@ -47,6 +47,7 @@
         tmux = callModule "tmux";
         bat = callModule "bat";
         eza = callModule "eza";
+        chromium = callModule "chromium";
         foot = callModule "foot";
         fuzzel = callModule "fuzzel";
         zed = callModule "zed";
@@ -124,7 +125,7 @@
           self.packages.${pkgs.stdenv.hostPlatform.system}.tg-web
           pkgs.pcmanfm
           pkgs.engrampa
-          pkgs.ungoogled-chromium
+          self.packages.${pkgs.stdenv.hostPlatform.system}.chromium
         ];
         xdg.mime.defaultApplications."x-scheme-handler/tg" = "tg-web.desktop";
         xdg.mime.defaultApplications."inode/directory" = "pcmanfm.desktop";

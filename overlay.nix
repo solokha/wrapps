@@ -16,6 +16,7 @@ in {
     tmux = inputs.self.packages.${system}.tmux;
     bat = inputs.self.packages.${system}.bat;
     eza = inputs.self.packages.${system}.eza;
+    chromium = inputs.self.packages.${system}.chromium;
     foot = inputs.self.packages.${system}.foot;
     fuzzel = inputs.self.packages.${system}.fuzzel;
     zed = inputs.self.packages.${system}.zed;
