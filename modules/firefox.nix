@@ -157,6 +157,7 @@ in
 
   extraPrefs = ''
     lockPref("browser.startup.homepage", "about:blank");
+    lockPref("browser.startup.page", 3);
     lockPref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
     lockPref("browser.tabs.inTitlebar", 1);
     lockPref("browser.uiCustomization.state", ${builtins.toJSON (builtins.toJSON uiState)});
