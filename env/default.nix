@@ -30,10 +30,6 @@
     cfg="$HOME/.ssh/config"
     marker="# wrapps: FIDO2-ключи"
 
-    # Свой блок переписываем с нуля, а не «если нет»: ssh читает пользовательский
-    # конфиг раньше системного, поэтому именно этот блок задаёт порядок
-    # IdentityFile. Блок дописан в конец файла — вырезаем его целиком, иначе он
-    # залипает навсегда (в том числе со старым порядком ключей).
     if [ -f "$cfg" ] && grep -qF "$marker" "$cfg"; then
       tmp="$cfg.wrapps.$$"
       awk '
@@ -44,19 +40,11 @@
       ' "$cfg" >"$tmp" && cat "$tmp" >"$cfg" && rm -f "$tmp"
     fi
 
-    # ssh складывает IdentityFile из системного и пользовательского конфигов,
-    # а не перезаписывает. Если sk-ключи уже перечислены системой, свой блок
-    # не нужен — иначе каждый ключ попадёт в перебор дважды. Проверяем файл
-    # напрямую: ssh -G -F /dev/null отбрасывает и системный конфиг, поэтому
-    # через него это не видно.
     if [ -r /etc/ssh/ssh_config ] && grep -qE '^[[:space:]]*IdentityFile.*(_sk|id_ecdsa_sk|id_ed25519_sk)' /etc/ssh/ssh_config; then
       printf 'системный ssh_config уже перечисляет sk-ключи — блок в %s убран\n' "$cfg" >&2
       exit 0
     fi
 
-    # Порядок важен: ssh идёт по IdentityFile слева направо и спотыкается на
-    # первом же токене, которого нет под рукой. @clone — тот, что всегда с
-    # собой, поэтому его ключи кладём раньше @alone.
     keys=""
     for want in clone other; do
       for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
@@ -109,12 +97,6 @@
     mkdir -p "$(dirname "$sock")"
     pidfile="$sock.pid"
 
-    # Порядок ключей в агенте — это и есть порядок, в котором ssh предлагает
-    # ключи серверу: ключи из агента идут раньше файловых и в порядке агента
-    # (sshconnect2.c, agent_keys), поэтому IdentityFile в ssh_config здесь
-    # ничего не решает. @clone — тот, что всегда с собой, поэтому первым: иначе
-    # ssh первым предлагает @alone и тратит PIN и касание на ключ, которого рядом
-    # нет. Тот же порядок задаёт wrapps-ssh-config для случая без агента.
     keys=""
     for want in clone other; do
       for k in "$HOME"/.ssh/id_ecdsa_sk* "$HOME"/.ssh/id_ed25519_sk*; do
@@ -146,10 +128,6 @@
         why="диалог не тот (в pidfile: ''${want:-пусто}, сейчас: $dialog_kind)"
         return 1
       fi
-      # Порядок ключей — тоже часть агента, а не украшение: агент, поднятый
-      # старым скриптом, останется с прежним порядком до перезапуска, и это
-      # молчаливая поломка (лишний PIN и касание на каждом push). Поэтому
-      # сохранённый список сравниваем так же, как вид диалога.
       want="$(sed -n '3p' "$pidfile" 2>/dev/null || true)"
       if [ "$want" != "$keys" ]; then
         why="порядок ключей в агенте не тот (в pidfile: ''${want:-пусто})"
@@ -185,8 +163,6 @@
       exit 1
     }
 
-    # $keys без кавычек намеренно: это список путей, разделённых пробелом, и
-    # пробелов внутри самих путей не бывает (имена ключей — из ssh-keygen -K).
     for k in $keys; do
       ssh-add "$k" >/dev/null 2>&1 || true
     done
@@ -199,35 +175,17 @@
     echo "export SSH_AUTH_SOCK=$sock"
   '';
 
-  # Конфиг atuin кладём в store: atuin читает его из ATUIN_CONFIG_DIR
-  # (см. envrc), а ~/.config/atuin не в пресетах preservation и откатывается
-  # вместе с корнем, поэтому в home ему жить незачем. Источник правды —
-  # atuin.toml.
   atuinConfig = pkgs.writeTextDir "config.toml" (builtins.readFile ./atuin.toml);
 
   envrc = pkgs.writeText "envrc" ''
-    # Переменные хоста из harness: HARNESS_DIR, PKM_VAULT и адреса локальных
-    # моделей для opencode.json ({env:LOCAL_MAIN_URL}/{env:LOCAL_FAST_URL}).
-    # Канонический файл ставит install.sh harness (симлинк на hosts/<host>.env);
-    # если его нет — молча пропускаем, среда остаётся рабочей без локальных
-    # моделей. Место подгрузки выбрано по harness/README.md: инициализация
-    # оболочки у нас — этот rcfile, а не ~/.bashrc.
     if [ -r "$HOME/.config/harness.env" ]; then
       set -a
       . "$HOME/.config/harness.env"
       set +a
     fi
 
-    # atuin в bash работает только через интерфейс bash-preexec: сам init лишь
-    # дописывает __atuin_preexec/__atuin_precmd в preexec_functions и
-    # precmd_functions, а вызывает их bash-preexec. Без него ATUIN_HISTORY_ID
-    # остаётся пустым (ATUIN_PREEXEC_BACKEND=<shlvl>:none), __atuin_precmd
-    # выходит на первой же строке, и история не пишется вовсе. Тот же пробел у
-    # NixOS-модуля programs.atuin — он тоже просто делает atuin init.
     source ${pkgs.bash-preexec}/share/bash/bash-preexec.sh
 
-    # starship идёт после bash-preexec: увидев __bp_imported, он регистрируется
-    # через precmd_functions, а не перетирает PROMPT_COMMAND.
     eval "$(${pkgs.starship}/bin/starship init bash)"
 
     export ATUIN_CONFIG_DIR=${atuinConfig}
@@ -242,14 +200,6 @@
     _have_fido=0
     grep -lqiE 'HID_NAME=.*FIDO' /sys/class/hidraw/hidraw*/device/uevent 2>/dev/null && _have_fido=1
 
-    # Хост объявляет свой агент раньше нас: NixOS `programs.ssh.startAgent`
-    # кладёт `SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent` в `set-environment`, то
-    # есть во все процессы сессии, а ключи FIDO2 грузит только `wrapps-agent`.
-    # Две щели, в которые это выходит боком, говорим вслух: ключей с токена в
-    # ~/.ssh ещё нет (терминал, открытый до `ssh-keygen -K`, останется с чужим
-    # пустым агентом навсегда — env уже унаследован), и агент не поднялся, так
-    # что сокет остался чужим. Симптом у обоих один: push отвечает
-    # «Permission denied (publickey)», что читается как «доступа нет».
     _sock="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wrapps-agent.sock"
     if [ "$_have_key" = 1 ] && [ "$_have_fido" = 1 ]; then
       eval "$(${agent}/bin/wrapps-agent)"
@@ -263,10 +213,6 @@
     fi
     unset _sock
 
-    # direnv: .envrc в infra подхватывает devShell и локальный wrapps.
-    # Хук ставим здесь, а не в ~/.bashrc: инициализация оболочки у нас — этот
-    # rcfile. Разрешение каталога (direnv allow) — состояние пользователя,
-    # в infra оно живёт в cache.
     if command -v direnv >/dev/null 2>&1; then
       eval "$(direnv hook bash)"
     fi

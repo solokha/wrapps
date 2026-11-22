@@ -37,7 +37,13 @@ nix run github:solokha/wrapps/main#env
 - `shell` — interactive shell with environment loaded
 - `denv` — direct environment launcher
 - `desktop` — full desktop environment
-- `noctalia` — theme collection
+- `noctalia` — Noctalia shell with its settings
+
+## Empty config stubs
+
+`env/btop.conf` and `env/tmux.conf` are intentionally empty: Noctalia templates
+do not create these files, they edit existing ones. Do not delete them, or the
+Noctalia theme will not be applied.
 
 ## Packages
 

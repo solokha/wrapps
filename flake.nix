@@ -114,13 +114,6 @@
       }: {
         imports = [self.nixosModules.default];
 
-        # Ссылки tg:// (кнопка «Join Channel» на страницах t.me) отдаются
-        # обработчику из этого же репозитория: Firefox схему не умеет, а
-        # Telegram Web зарегистрировать её себе не может. Регистрация — та же,
-        # что у нативных приложений: .desktop в systemPackages плюс запись в
-        # XDG-базе схем (xdg.mime → /etc/xdg/mimeapps.list). Живёт здесь, а не
-        # в infra: это десктопная интеграция, и Exec указывает на обёрнутый
-        # firefox из wrapps.
         environment.systemPackages = [
           self.packages.${pkgs.stdenv.hostPlatform.system}.tg-web
           pkgs.pcmanfm
@@ -142,13 +135,10 @@
   };
 
   inputs = {
-    # Временно nixos-unstable: нужен oo7 0.7.x и свежие пакеты. При выходе
-    # 26.11 меняется только эта строка — остальной флейк не трогаем.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nix-wrapper-modules = {
       url = "github:nix-community/nix-wrapper-modules";
-      # Иначе библиотека тянет собственный nixpkgs и второй бинарный кэш.
       inputs.nixpkgs.follows = "nixpkgs";
     };
     llm-agents = {

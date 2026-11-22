@@ -3,10 +3,6 @@
   inputs,
   ...
 }: let
-  # Конфиг foot генерируется wrapper-модулем: settings — секции INI с
-  # атрибутами, а не строка. Тема приходит из Noctalia по include; путь
-  # фиксирован в ~/.config, потому что foot раскрывает только `~/`, а
-  # XDG_CONFIG_HOME у нас не задан.
   foot = inputs.nix-wrapper-modules.wrappers.foot.wrap {
     inherit pkgs;
     settings = {
@@ -29,8 +25,6 @@
     };
   };
 
-  # Пока Noctalia не записала свою тему, foot стартует без include: файла нет,
-  # ошибка не фатальна, но цвета будут дефолтные. Кладём запасную палитру.
   fallbackTheme = pkgs.writeText "foot-noctalia.fallback" ''
     [colors-dark]
     foreground=545464

@@ -14,18 +14,12 @@ in
 
     log() { printf 'desktop: %s\n' "$*"; }
 
-    # Обоина кладётся в стабильный путь в HOME: store-путь из пакета исчезает
-    # при сборке мусора, а config.toml ссылается на этот путь.
     wallpaper_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/wallpapers"
     mkdir -p "$wallpaper_dir"
     if ! install -m 644 ${../wallpapers/ef_the_cat_returns.jpg} "$wallpaper_dir/ef_the_cat_returns.jpg"; then
       log "не удалось положить обоину — останется прежняя"
     fi
 
-    # starship.toml кладём до старта niri: noctalia применяет свой builtin-шаблон
-    # starship и создаёт файл раньше, после чего «если нет» в denv уже не
-    # срабатывает и промпт остаётся дефолтным. Существующий не трогаем — то же
-    # правило, что у denv.
     starship_config="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
     if [ ! -f "$starship_config" ]; then
       mkdir -p "$(dirname "$starship_config")"
@@ -39,8 +33,6 @@ in
       exec ${shell} "$@"
     fi
 
-    # GTK3 читает settings.ini, а GTK4/портал/часть приложений — gsettings.
-    # Без этого icon-theme остаётся Adwaita, хотя в settings.ini Gruvbox.
     if command -v gsettings >/dev/null 2>&1; then
       gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3 2>/dev/null || true
       gsettings set org.gnome.desktop.interface icon-theme Gruvbox-Plus-Dark 2>/dev/null || true

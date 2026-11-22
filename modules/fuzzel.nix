@@ -3,8 +3,6 @@
   inputs,
   ...
 }:
-# Конфиг fuzzel — wrapper-модуль вместо строки heredoc. Тема Noctalia
-# подключается по include; путь в ~/.config, как и у foot.
 inputs.nix-wrapper-modules.wrappers.fuzzel.wrap {
   inherit pkgs;
   settings.main = {

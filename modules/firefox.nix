@@ -3,13 +3,8 @@
   sitePolicies ? [],
   ...
 }:
-# Обычный release, а не ESR: SitePolicies.Container нужен с Firefox 158, в ESR 153
-# его нет. Вернуться на ESR, когда там появится 158 (следующий ESR, ~166).
 pkgs.wrapFirefox pkgs.firefox-unwrapped {
   extraPolicies = {
-    # Маршрутизация сайтов по контейнерам (SitePolicies.Container). Сами правила —
-    # хостовый факт, поэтому живут в infra и приходят через NixOS-опцию
-    # wrapps.firefox.sitePolicies. В публичном пакете список пустой.
     SitePolicies = sitePolicies;
 
     DisableTelemetry = true;
@@ -100,46 +95,21 @@ pkgs.wrapFirefox pkgs.firefox-unwrapped {
     lockPref("privacy.globalprivacycontrol.functionality.enabled", true);
     lockPref("intl.accept_languages", "ru, en-US, en");
 
-    // Встроенный перевод страниц: модели Bergamot считаются на машине, текст
-    // страниц наружу не уходит; пара языков докачивается с Mozilla при первом
-    // переводе. Автоперевода нет (alwaysTranslateLanguages не задан) —
-    // панель только предлагается, переводить или читать как есть решаешь сам.
-    // Русские страницы не предлагать. Обычный pref, а не lockPref: всё
-    // переключается обратно из интерфейса.
     pref("browser.translations.enable", true);
     pref("browser.translations.automaticallyPopup", true);
     pref("browser.translations.neverTranslateLanguages", "ru");
 
-    // Контейнеры — встроенная фича Firefox. SitePolicies включает этот pref сам,
-    // но фиксируем явно: от него зависит маршрутизация по контейнерам.
     pref("privacy.userContext.enabled", true);
 
-    // Закреплённые окна-«веб-приложения»: кнопка «Add tab to taskbar» в адресной
-    // строке, каждой записи — свои домены в области видимости, на Linux
-    // дополнительно создаётся .desktop-файл. На вертикальные табы
-    // (sidebar.verticalTabs) не влияет — фичи независимы.
-    // pref, а не lockPref: переключается обратно из интерфейса.
     pref("browser.taskbarTabs.enabled", true);
 
-    // Схему tg:// Firefox сам обработать не может: сайту разрешено занять
-    // только web+tg://, а Telegram Web себе его не регистрирует. Отдаём схему
-    // системе — обработчик tg-web из этого же репозитория (modules/tg-web.nix).
-    // Три pref'а — тот же набор, что у mailto в самом firefox.js:
-    // external — схема обслуживается внешним приложением,
-    // expose=false — не пытаться обработать её внутри,
-    // warn-external=false — не спрашивать каждый раз «чем открыть».
     pref("network.protocol-handler.external.tg", true);
     pref("network.protocol-handler.expose.tg", false);
     pref("network.protocol-handler.warn-external.tg", false);
 
-    // vimium из списка force_installed: показывать подсказки, не разворачивать
-    // панели настроек, и не мешать раскладке.
     pref("extensions.vimiumc.showAdvanced", false);
     pref("extensions.vimiumc.ignoreKeyboardLayout", true);
 
-    // Системная тема Firefox: светлая/тёмная по GTK/порталу, без
-    // принудительного Everforest. Цвета интерфейса приходят из Noctalia
-    // через GTK-шаблоны; после смены палитры браузер перезапускается.
     pref("extensions.activeThemeID", "default-theme@mozilla.org");
   '';
 }

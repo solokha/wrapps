@@ -12,8 +12,6 @@
     prefer-no-csd
 
     spawn-at-startup "${noctalia}"
-    // Кнопки Bluetooth-гарнитуры приходят как AVRCP; без mpris-proxy они не
-    // доходят до MPRIS-плееров (Firefox и т.п.).
     spawn-at-startup "${lib.getExe' pkgs.bluez "mpris-proxy"}"
 
     input {
@@ -114,8 +112,6 @@
       }
     }
 
-    // Скругление окон: niri режет поверхность по геометрии, иначе углы
-    // остаются прямыми, а рамка рисуется по прямоугольнику.
     window-rule {
       geometry-corner-radius 12
       clip-to-geometry true

@@ -1,16 +1,12 @@
 {inputs}: final: prev: let
   system = final.stdenv.hostPlatform.system;
 
-  # llm-agents собирает свои пакеты против final, а не против своего nixpkgs:
-  # closure совпадает с системой потребителя. Кэш cache.numtide.com попадает
-  # только при совпадении ревизий nixpkgs — ради этого и follows на входе.
   llm-agents = (inputs.llm-agents.overlays.shared-nixpkgs final prev).llm-agents;
 in {
   master = import inputs.nixpkgs-master {
     inherit system;
     config.allowUnfree = true;
   };
-  # Пакеты llm-agents под своим именем: pkgs.llm-agents.opencode2 и т. д.
   inherit llm-agents;
   wrapps = {
     opencode = inputs.self.packages.${system}.opencode;
