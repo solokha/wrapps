@@ -8,6 +8,16 @@
   terminal = "${self.packages.${pkgs.stdenv.hostPlatform.system}.foot}/bin/foot";
   launcher = "${self.packages.${pkgs.stdenv.hostPlatform.system}.fuzzel}/bin/fuzzel";
   noctalia = "${self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia}/bin/noctalia";
+  niri = "${pkgs.niri}/bin/niri";
+
+  quake = pkgs.writeShellScript "quake" ''
+    set -eu
+    win="$(${niri} msg --json windows | ${pkgs.jq}/bin/jq -r '[.[] | select(.app_id == "dropdown")][0].id // empty')"
+    if [ -n "$win" ]; then
+      exec ${niri} msg action close-window --id "$win"
+    fi
+    exec ${terminal} --app-id=dropdown ${self.packages.${pkgs.stdenv.hostPlatform.system}.tmux}/bin/tmux new-session -A -s quake
+  '';
 in
   inputs.nix-wrapper-modules.wrappers.niri.wrap {
     inherit pkgs;
@@ -61,12 +71,10 @@ in
         "Mod+Ctrl+Comma".move-column-to-first = _: {};
         "Mod+Ctrl+Period".move-column-to-last = _: {};
 
-        "Mod+Page_Up".focus-workspace-up = _: {};
-        "Mod+Page_Down".focus-workspace-down = _: {};
         "Mod+U".focus-workspace-up = _: {};
         "Mod+I".focus-workspace-down = _: {};
-        "Mod+Shift+Page_Up".move-workspace-up = _: {};
-        "Mod+Shift+Page_Down".move-workspace-down = _: {};
+        "Mod+Shift+U".move-workspace-up = _: {};
+        "Mod+Shift+I".move-workspace-down = _: {};
 
         "Mod+1".focus-workspace = "w0";
         "Mod+2".focus-workspace = "w1";
@@ -108,9 +116,17 @@ in
 
         "Mod+Return".spawn = [terminal];
         "Mod+D".spawn = [launcher];
+        "Mod+grave".spawn-sh = "${quake}/bin/quake";
 
         "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
         "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
+        "XF86AudioMute".spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        "XF86AudioMicMute".spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+        "XF86AudioPlay".spawn-sh = "${pkgs.playerctl}/bin/playerctl play-pause";
+        "XF86AudioNext".spawn-sh = "${pkgs.playerctl}/bin/playerctl next";
+        "XF86AudioPrev".spawn-sh = "${pkgs.playerctl}/bin/playerctl previous";
+        "XF86MonBrightnessUp".spawn-sh = "${pkgs.brightnessctl}/bin/brightnessctl set 5%+";
+        "XF86MonBrightnessDown".spawn-sh = "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
       };
 
       layout = {
@@ -122,6 +138,19 @@ in
         {
           geometry-corner-radius = 12;
           clip-to-geometry = true;
+        }
+        {
+          matches = [{app-id = "^dropdown$";}];
+          open-floating = true;
+          default-floating-position = _: {
+            props = {
+              x = 0;
+              y = 0;
+              relative-to = "top";
+            };
+          };
+          default-window-height = {proportion = 0.5;};
+          default-column-width = {proportion = 0.8;};
         }
       ];
     };
