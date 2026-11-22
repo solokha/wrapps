@@ -171,7 +171,7 @@ in
     pref("browser.translations.automaticallyPopup", true);
     pref("browser.translations.neverTranslateLanguages", "ru");
 
-    lockPref("browser.ml.chat.providers", "chatgpt,gemini,huggingchat,scout");
+    lockPref("browser.ml.chat.providers", "chatgpt,gemini,huggingchat");
 
     pref("privacy.userContext.enabled", true);
 
