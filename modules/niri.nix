@@ -2,140 +2,131 @@
   pkgs,
   lib,
   self,
+  inputs,
   ...
 }: let
   terminal = "${self.packages.${pkgs.stdenv.hostPlatform.system}.foot}/bin/foot";
   launcher = "${self.packages.${pkgs.stdenv.hostPlatform.system}.fuzzel}/bin/fuzzel";
   noctalia = "${self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia}/bin/noctalia";
-
-  cfg = pkgs.writeText "niri-config.kdl" ''
-    prefer-no-csd
-
-    spawn-at-startup "${noctalia}"
-    spawn-at-startup "${lib.getExe' pkgs.bluez "mpris-proxy"}"
-
-    input {
-      keyboard {
-        xkb {
-          layout "us,ru"
-          options "grp:win_space_toggle,caps:escape"
-        }
-        repeat-rate 30
-        repeat-delay 300
-      }
-      touchpad {
-        natural-scroll
-        tap
-      }
-      mouse {
-        accel-profile "flat"
-      }
-    }
-
-    binds {
-      Mod+W { close-window; }
-      Mod+Q { close-window; }
-      Mod+Shift+E { quit; }
-
-      Mod+Left  { focus-column-left; }
-      Mod+Right { focus-column-right; }
-      Mod+Up    { focus-window-up; }
-      Mod+Down  { focus-window-down; }
-      Mod+H     { focus-column-left; }
-      Mod+L     { focus-column-right; }
-      Mod+K     { focus-window-up; }
-      Mod+J     { focus-window-down; }
-
-      Mod+Ctrl+Left  { move-column-left; }
-      Mod+Ctrl+Right { move-column-right; }
-      Mod+Ctrl+Up    { move-window-up; }
-      Mod+Ctrl+Down  { move-window-down; }
-      Mod+Home       { focus-column-first; }
-      Mod+End        { focus-column-last; }
-      Mod+Ctrl+Home  { move-column-to-first; }
-      Mod+Ctrl+End   { move-column-to-last; }
-
-      Mod+Page_Up          { focus-workspace-up; }
-      Mod+Page_Down        { focus-workspace-down; }
-      Mod+U                { focus-workspace-up; }
-      Mod+I                { focus-workspace-down; }
-      Mod+Shift+Page_Up    { move-workspace-up; }
-      Mod+Shift+Page_Down  { move-workspace-down; }
-
-      Mod+1 { focus-workspace "w0"; }
-      Mod+2 { focus-workspace "w1"; }
-      Mod+3 { focus-workspace "w2"; }
-      Mod+4 { focus-workspace "w3"; }
-      Mod+5 { focus-workspace "w4"; }
-
-      Mod+Shift+1 { move-column-to-workspace "w0"; }
-      Mod+Shift+2 { move-column-to-workspace "w1"; }
-      Mod+Shift+3 { move-column-to-workspace "w2"; }
-
-      Mod+WheelScrollUp          { focus-workspace-up; }
-      Mod+WheelScrollDown        { focus-workspace-down; }
-      Mod+Ctrl+WheelScrollUp     { move-column-to-workspace-up; }
-      Mod+Ctrl+WheelScrollDown   { move-column-to-workspace-down; }
-      Mod+WheelScrollLeft        { focus-column-left; }
-      Mod+WheelScrollRight       { focus-column-right; }
-
-      Mod+F { maximize-column; }
-      Mod+G { fullscreen-window; }
-      Mod+M { maximize-window-to-edges; }
-      Mod+C { center-column; }
-      Mod+R { switch-preset-column-width; }
-      Mod+T { toggle-column-tabbed-display; }
-      Mod+V { toggle-window-floating; }
-      Mod+Shift+V { switch-focus-between-floating-and-tiling; }
-
-      Mod+Ctrl+H { set-column-width "-5%"; }
-      Mod+Ctrl+L { set-column-width "+5%"; }
-      Mod+Ctrl+J { set-window-height "-5%"; }
-      Mod+Ctrl+K { set-window-height "+5%"; }
-
-      Mod+O { toggle-overview; }
-      Mod+Shift+Slash { show-hotkey-overlay; }
-      Mod+Shift+P { power-off-monitors; }
-      Mod+Shift+S { screenshot; }
-
-      Mod+Return { spawn "${terminal}"; }
-      Mod+D { spawn "${launcher}"; }
-
-      XF86AudioRaiseVolume { spawn-sh "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+"; }
-      XF86AudioLowerVolume { spawn-sh "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-"; }
-    }
-
-    layout {
-      gaps 6
-      focus-ring {
-        width 3
-      }
-    }
-
-    window-rule {
-      geometry-corner-radius 12
-      clip-to-geometry true
-    }
-
-    include optional=true "/etc/niri/user-dirs.kdl"
-    include optional=true "/etc/niri/cursor.kdl"
-
-    include optional=true "~/.config/niri/noctalia.kdl"
-  '';
 in
-  pkgs.symlinkJoin {
-    name = "niri-wrapped";
-    paths = [pkgs.niri];
-    nativeBuildInputs = [pkgs.makeWrapper];
-    meta.mainProgram = "niri";
-    postBuild = ''
-      mv $out/bin/niri $out/bin/.niri-real
-      printf '%s\n' \
-        '#!${pkgs.bash}/bin/bash' \
-        'set -eu' \
-        'export NIRI_CONFIG=${cfg}' \
-        'exec '"$out"'/bin/.niri-real "$@"' \
-        >$out/bin/niri
-      chmod +x $out/bin/niri
-    '';
+  inputs.nix-wrapper-modules.wrappers.niri.wrap {
+    inherit pkgs;
+
+    settings = {
+      prefer-no-csd = _: {};
+
+      spawn-at-startup = [
+        noctalia
+        (lib.getExe' pkgs.bluez "mpris-proxy")
+      ];
+
+      input = {
+        keyboard = {
+          xkb = {
+            layout = "us,ru";
+            options = "grp:win_space_toggle,caps:escape";
+          };
+          repeat-rate = 30;
+          repeat-delay = 300;
+        };
+
+        touchpad = {
+          natural-scroll = _: {};
+          tap = _: {};
+        };
+
+        mouse.accel-profile = "flat";
+      };
+
+      binds = {
+        "Mod+W".close-window = _: {};
+        "Mod+Q".close-window = _: {};
+        "Mod+Shift+E".quit = _: {};
+
+        "Mod+Left".focus-column-left = _: {};
+        "Mod+Right".focus-column-right = _: {};
+        "Mod+Up".focus-window-up = _: {};
+        "Mod+Down".focus-window-down = _: {};
+        "Mod+H".focus-column-left = _: {};
+        "Mod+L".focus-column-right = _: {};
+        "Mod+K".focus-window-up = _: {};
+        "Mod+J".focus-window-down = _: {};
+
+        "Mod+Ctrl+Left".move-column-left = _: {};
+        "Mod+Ctrl+Right".move-column-right = _: {};
+        "Mod+Ctrl+Up".move-window-up = _: {};
+        "Mod+Ctrl+Down".move-window-down = _: {};
+        "Mod+Home".focus-column-first = _: {};
+        "Mod+End".focus-column-last = _: {};
+        "Mod+Ctrl+Home".move-column-to-first = _: {};
+        "Mod+Ctrl+End".move-column-to-last = _: {};
+
+        "Mod+Page_Up".focus-workspace-up = _: {};
+        "Mod+Page_Down".focus-workspace-down = _: {};
+        "Mod+U".focus-workspace-up = _: {};
+        "Mod+I".focus-workspace-down = _: {};
+        "Mod+Shift+Page_Up".move-workspace-up = _: {};
+        "Mod+Shift+Page_Down".move-workspace-down = _: {};
+
+        "Mod+1".focus-workspace = "w0";
+        "Mod+2".focus-workspace = "w1";
+        "Mod+3".focus-workspace = "w2";
+        "Mod+4".focus-workspace = "w3";
+        "Mod+5".focus-workspace = "w4";
+
+        "Mod+Shift+1".move-column-to-workspace = "w0";
+        "Mod+Shift+2".move-column-to-workspace = "w1";
+        "Mod+Shift+3".move-column-to-workspace = "w2";
+
+        "Mod+WheelScrollUp".focus-workspace-up = _: {};
+        "Mod+WheelScrollDown".focus-workspace-down = _: {};
+        "Mod+Ctrl+WheelScrollUp".move-column-to-workspace-up = _: {};
+        "Mod+Ctrl+WheelScrollDown".move-column-to-workspace-down = _: {};
+        "Mod+WheelScrollLeft".focus-column-left = _: {};
+        "Mod+WheelScrollRight".focus-column-right = _: {};
+
+        "Mod+F".maximize-column = _: {};
+        "Mod+G".fullscreen-window = _: {};
+        "Mod+M".maximize-window-to-edges = _: {};
+        "Mod+C".center-column = _: {};
+        "Mod+R".switch-preset-column-width = _: {};
+        "Mod+T".toggle-column-tabbed-display = _: {};
+        "Mod+V".toggle-window-floating = _: {};
+        "Mod+Shift+V".switch-focus-between-floating-and-tiling = _: {};
+
+        "Mod+Ctrl+H".set-column-width = "-5%";
+        "Mod+Ctrl+L".set-column-width = "+5%";
+        "Mod+Ctrl+J".set-window-height = "-5%";
+        "Mod+Ctrl+K".set-window-height = "+5%";
+
+        "Mod+O".toggle-overview = _: {};
+        "Mod+Shift+Slash".show-hotkey-overlay = _: {};
+        "Mod+Shift+P".power-off-monitors = _: {};
+        "Mod+Shift+S".screenshot = _: {};
+
+        "Mod+Return".spawn = [terminal];
+        "Mod+D".spawn = [launcher];
+
+        "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
+        "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
+      };
+
+      layout = {
+        gaps = 6;
+        focus-ring.width = 3;
+      };
+
+      window-rules = [
+        {
+          geometry-corner-radius = 12;
+          clip-to-geometry = true;
+        }
+      ];
+    };
+
+    extraSettings = [
+      {include = [{optional = true;} "/etc/niri/user-dirs.kdl"];}
+      {include = [{optional = true;} "/etc/niri/cursor.kdl"];}
+      {include = [{optional = true;} "~/.config/niri/noctalia.kdl"];}
+    ];
   }

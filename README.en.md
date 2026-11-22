@@ -41,7 +41,7 @@ nix run github:solokha/wrapps/main#env
 
 ## Environment configs
 
-`atuin`, `btop`, `starship` and `tmux` are built with wrapper modules: settings
+`niri`, `opencode`, `atuin`, `btop`, `starship` and `tmux` are built with wrapper modules: settings
 are Nix attributes in `modules/`, generated files live in the store. `starship.toml`
 is also copied to `~/.config` before Noctalia starts, because its template appends
 the palette there.

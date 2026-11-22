@@ -41,7 +41,7 @@ nix run github:solokha/wrapps/main#env
 
 ## Конфиги окружения
 
-`atuin`, `btop`, `starship` и `tmux` собираются wrapper-модулями: настройки
+`niri`, `opencode`, `atuin`, `btop`, `starship` и `tmux` собираются wrapper-модулями: настройки
 заданы атрибутами в `modules/`, готовые файлы лежат в store. `starship.toml`
 дополнительно кладётся в `~/.config` перед стартом Noctalia, потому что её
 шаблон дописывает туда палитру.
