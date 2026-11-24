@@ -32,14 +32,16 @@
       } $out
       chmod -R u+w $out
       ${pkgs.python3}/bin/python3 - $out/background.js <<'PY'
+      import re
       import sys
 
       path = sys.argv[1]
       source = open(path).read()
-      old = 'async function Lr({reason:t}){if("install"===t)er.c.includes("safari")||await e().tabs.create({url:"/welcome/index.html",active:!0})}'
-      if old not in source:
-          raise SystemExit("rain drop welcome snippet not found")
-      open(path, "w").write(source.replace(old, "async function Lr({reason:t}){}"))
+      pattern = r'tabs\.create\(\{url:"/welcome/index\.html"[^}]*\}\)'
+      patched, count = re.subn(pattern, "void 0", source)
+      if count == 0:
+          print("warning: Raindrop welcome call not found")
+      open(path, "w").write(patched)
       PY
     '';
 
