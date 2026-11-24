@@ -120,6 +120,11 @@ in
         installation_mode = "force_installed";
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
       };
+
+      "jordanlinkwarden@gmail.com" = {
+        installation_mode = "force_installed";
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/linkwarden/latest.xpi";
+      };
     };
 
     FirefoxHome = {
