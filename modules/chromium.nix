@@ -20,15 +20,35 @@
       unzip -q ext.zip -d $out
     '';
 
+  raindrop =
+    pkgs.runCommand "chromium-ext-raindrop" {
+      nativeBuildInputs = [pkgs.python3];
+    } ''
+      cp -r ${
+        fetchCrx {
+          id = "ldgfbffkinooeloadekpmfoklnobpien";
+          hash = "sha256-zHxhKB0Jq88rJWRxHruACBdq8fhDgtltMi2uoZ6MCiY=";
+        }
+      } $out
+      chmod -R u+w $out
+      ${pkgs.python3}/bin/python3 - $out/background.js <<'PY'
+      import sys
+
+      path = sys.argv[1]
+      source = open(path).read()
+      old = 'async function Lr({reason:t}){if("install"===t)er.c.includes("safari")||await e().tabs.create({url:"/welcome/index.html",active:!0})}'
+      if old not in source:
+          raise SystemExit("rain drop welcome snippet not found")
+      open(path, "w").write(source.replace(old, "async function Lr({reason:t}){}"))
+      PY
+    '';
+
   extensions = [
     (fetchCrx {
       id = "nngceckbapebfimnlniiiahkandclblb";
       hash = "sha256-W7/EQcarOCqGd7EzrqP8P/K67XzP5usbFhcbQpiTc/I=";
     })
-    (fetchCrx {
-      id = "ldgfbffkinooeloadekpmfoklnobpien";
-      hash = "sha256-zHxhKB0Jq88rJWRxHruACBdq8fhDgtltMi2uoZ6MCiY=";
-    })
+    raindrop
     (fetchCrx {
       id = "dbepggeogbaibhgnhhndojpepiihcmeb";
       hash = "sha256-MZjCaqcZvkYt6lhQUPvtm4uAYo1X6oihE7q/UzTFUXw=";
