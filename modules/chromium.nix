@@ -20,37 +20,15 @@
       unzip -q ext.zip -d $out
     '';
 
-  raindrop =
-    pkgs.runCommand "chromium-ext-raindrop" {
-      nativeBuildInputs = [pkgs.python3];
-    } ''
-      cp -r ${
-        fetchCrx {
-          id = "ldgfbffkinooeloadekpmfoklnobpien";
-          hash = "sha256-zHxhKB0Jq88rJWRxHruACBdq8fhDgtltMi2uoZ6MCiY=";
-        }
-      } $out
-      chmod -R u+w $out
-      ${pkgs.python3}/bin/python3 - $out/background.js <<'PY'
-      import re
-      import sys
-
-      path = sys.argv[1]
-      source = open(path).read()
-      pattern = r'tabs\.create\(\{url:"/welcome/index\.html"[^}]*\}\)'
-      patched, count = re.subn(pattern, "void 0", source)
-      if count == 0:
-          print("warning: Raindrop welcome call not found")
-      open(path, "w").write(patched)
-      PY
-    '';
-
   extensions = [
     (fetchCrx {
       id = "nngceckbapebfimnlniiiahkandclblb";
       hash = "sha256-W7/EQcarOCqGd7EzrqP8P/K67XzP5usbFhcbQpiTc/I=";
     })
-    raindrop
+    (fetchCrx {
+      id = "pnidmkljnhbjfffciajlcpeldoljnidn";
+      hash = "sha256-N42c7VmxVW9qxkgB3MXR8PL6kJoTxPOwFv+hueHDkTw=";
+    })
     (fetchCrx {
       id = "dbepggeogbaibhgnhhndojpepiihcmeb";
       hash = "sha256-MZjCaqcZvkYt6lhQUPvtm4uAYo1X6oihE7q/UzTFUXw=";
