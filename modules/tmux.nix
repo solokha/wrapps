@@ -8,7 +8,8 @@ inputs.nix-wrapper-modules.wrappers.tmux.wrap {
 
   baseIndex = 0;
   paneBaseIndex = 0;
-  mouse = false;
+  mouse = true;
+  historyLimit = 50000;
   escapeTime = 500;
   disableConfirmationPrompt = false;
 
